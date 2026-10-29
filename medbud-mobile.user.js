@@ -96,6 +96,39 @@
   ${S} :is(.bx-wrapper, .bx-viewport) { max-width: 100% !important; }
   ${S} aside.charter ul { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; }
   ${S} aside.charter li { float: none !important; width: auto !important; margin: 0 !important; }
+
+  /* Header: logo and the dark-mode switch on one row, then search, planner and the nav bar (was ~555px). */
+  ${S} header {
+    display: grid !important; grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "logo switch" "search search" "planner planner" "nav nav"; align-items: center; column-gap: 8px;
+  }
+  ${S} header > a#logo { grid-area: logo; }
+  ${S} header > a#logo img { max-height: 40px; width: auto !important; margin-top: 0 !important; }
+  ${S} header > form#search { grid-area: search; margin: 2px 0 !important; }
+  ${S} header > #calculator { grid-area: planner; }
+  ${S} header > #switchHolder { grid-area: switch; float: none !important; }
+  ${S} header > nav { grid-area: nav; margin-top: 4px !important; }
+  ${S} header > :is(#js-search, #calculatorResults) { grid-column: 1 / -1; }
+  ${S} div.wrapper.top-links {
+    display: flex; flex-wrap: nowrap; gap: 0 12px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    white-space: nowrap; text-align: left; scrollbar-width: none;
+  }
+
+  /* Tab strips (regions, statuses): one sideways-scrolling row instead of wrapped, overlapping labels. */
+  ${S} div.tabs { display: flex !important; flex-wrap: nowrap; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  ${S} div.tabs > a { flex: 0 0 auto; white-space: nowrap; min-height: 44px; display: inline-flex !important; align-items: center; box-sizing: border-box; }
+
+  /* Menu: the site's "more" panel opens on hover only; on phones a real button opens it as a full-screen sheet. */
+  ${S} .menuEllipsis__drop-toggle { min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  ${S}:not(.mbm-menu-open) header nav .menuEllipsis__more { display: none !important; }
+  ${S}.mbm-menu-open header nav .menuEllipsis__more {
+    display: block !important; position: fixed !important; top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important;
+    width: auto !important; max-height: none !important; z-index: 2147483000; overflow-y: auto; overscroll-behavior: contain;
+    background: #333; padding: 64px 8px 24px !important; box-sizing: border-box;
+  }
+  ${S}.mbm-menu-open body { overflow: hidden; }
+  ${S}.mbm-menu-open .mbm-menu-close { display: flex; }
+
   /* The nav's "more" panel hangs off a 44px button with right:0, so it ran off the left edge.
      Anchor it to the full-width nav bar and keep submenus inside it instead of flying out sideways. */
   ${S} header nav { position: relative; }
@@ -150,6 +183,13 @@
 }
 
 ${S} td[data-mbm-role=toggle] { display: none; }
+
+${S} .mbm-menu-close {
+  all: unset; box-sizing: border-box; display: none; position: fixed; top: 8px; right: 8px; z-index: 2147483001;
+  width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 50%;
+  background: rgba(255, 255, 255, .12); color: #fff; font-size: 1.25rem; cursor: pointer;
+}
+${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset: 2px; }
 
 @media (max-width: 767px) {
   /* Data tables as cards: name first, one meta line, the comparison number strongest, details on demand.
@@ -224,7 +264,7 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   ${R} > td[data-mbm-role=name] > a:first-child { display: block; font-size: 1.0625rem; font-weight: 600; max-width: none !important; padding: 2px 0; }
   ${R} > td[data-mbm-role=name] small { opacity: .75; }
   ${R} > td[data-mbm-role=name] img:not(.country) { display: block; width: auto !important; height: auto !important; max-height: 32px; max-width: 160px; margin-top: 8px; }
-  ${R} > td:is([data-mbm-role=meta], [data-mbm-role=meta2]) * { text-align: left !important; }
+  ${R} > td:is([data-mbm-role=meta], [data-mbm-role=meta2]) * { text-align: left !important; white-space: normal !important; overflow-wrap: anywhere; }
   ${R} > td[data-mbm-role=name] a { width: auto !important; max-width: 100% !important; white-space: normal !important; }
   ${R} > td[data-mbm-role=meta] { grid-area: meta; margin-top: 2px; }
   ${R} > td[data-mbm-role=meta2] { grid-area: meta2; margin-top: 2px; }
@@ -533,6 +573,61 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     grid.insertBefore(button, controls);
   }
 
+  /** The site's "more" menu opens on hover only. Make its toggle a real button opening a full-screen sheet. */
+  function setupMenu() {
+    const root = document.documentElement;
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'mbm-menu-close';
+    close.setAttribute('aria-label', 'Close menu');
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-times';
+    icon.setAttribute('aria-hidden', 'true');
+    close.appendChild(icon);
+    document.body.appendChild(close);
+
+    const toggles = () => document.querySelectorAll('.menuEllipsis__drop-toggle');
+    const label = (toggle) => {
+      toggle.setAttribute('role', 'button');
+      toggle.setAttribute('tabindex', '0');
+      toggle.setAttribute('aria-label', 'Menu');
+      toggle.setAttribute('aria-expanded', String(root.classList.contains('mbm-menu-open')));
+    };
+    const set = (open) => {
+      root.classList.toggle('mbm-menu-open', open);
+      toggles().forEach(label);
+      if (open) close.focus();
+      else if (toggles()[0]) toggles()[0].focus();
+    };
+    toggles().forEach(label);
+    // The site's menu plugin can rebuild its toggle on resize, so listen on the document.
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('.menuEllipsis__drop-toggle')) {
+        event.preventDefault();
+        set(!root.classList.contains('mbm-menu-open'));
+      } else if (event.target.closest('.mbm-menu-close')) {
+        set(false);
+      }
+    }, true);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && root.classList.contains('mbm-menu-open')) set(false);
+      else if ((event.key === 'Enter' || event.key === ' ') && event.target.closest && event.target.closest('.menuEllipsis__drop-toggle')) {
+        event.preventDefault();
+        set(!root.classList.contains('mbm-menu-open'));
+      }
+    });
+  }
+
+  /** The six "trust" badges filled ~400px of every first screen; they move to just above the footer. */
+  function moveCharter() {
+    const charter = document.querySelector('aside.charter');
+    const footer = document.querySelector('footer');
+    if (charter && footer && !charter.dataset.mbmMoved) {
+      charter.dataset.mbmMoved = '1';
+      footer.parentNode.insertBefore(charter, footer);
+    }
+  }
+
   function onReady() {
     // The style may have landed in <html> before <head> existed; move it so it sits after the site's CSS.
     const style = document.getElementById('medbud-mobile-css');
@@ -540,6 +635,8 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     setupCards();
     wrapWideTables(document);
     whenPresent('#mb-grid > .mb-controls', addFiltersToggle);
+    whenPresent('.menuEllipsis__drop-toggle', setupMenu);
+    moveCharter();
   }
 
   fixViewport();
