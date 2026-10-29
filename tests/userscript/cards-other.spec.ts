@@ -95,3 +95,13 @@ test('pharmacy rows render as cards', async ({ page }) => {
   }
   expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
 });
+
+test('a card-class table whose rows match no role map stays a scrolling table', async ({ page }) => {
+  // Discounts uses table.pharmacy-list with a different row structure; simulate that on the pharmacy menu.
+  await openMedbud(page, 'pharmacy', { transformHtml: (html) => html.replace(/class="product-row/g, 'class="discount-row') });
+  const table = page.locator('table.pharmacy-list').first();
+  await expect(table).not.toHaveClass(/mbm-cards/);
+  expect(await table.locator('> tbody > tr:visible').first().evaluate((tr) => getComputedStyle(tr).display)).toBe('table-row');
+  await expect(page.locator('.mbm-scroll > table.pharmacy-list').first()).toBeAttached();
+  expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
+});

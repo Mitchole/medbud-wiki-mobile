@@ -644,9 +644,20 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     });
   }
 
+  /**
+   * Only a table whose rows matched its role map becomes cards. Discounts shares table.pharmacy-list with the
+   * pharmacy menus but has a different row structure; without roles it stays a table in its scroll box.
+   */
+  function markCardTable(table) {
+    if (table.querySelector(':scope > tbody > tr > [data-mbm-role]:not([data-mbm-role=toggle])')) table.classList.add('mbm-cards');
+  }
+
   /** Rows the site adds later (sorting, filtering, loading more) become cards too. */
   function observeTable(table, roles) {
-    const observer = new MutationObserver(() => cardify(table, roles));
+    const observer = new MutationObserver(() => {
+      cardify(table, roles);
+      markCardTable(table);
+    });
     table.querySelectorAll(':scope > tbody').forEach((tbody) => observer.observe(tbody, { childList: true }));
   }
 
@@ -677,7 +688,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
           observeTable(table, roles);
           bindToggles(table);
         }
-        table.classList.add('mbm-cards');
+        markCardTable(table);
       });
     });
   }
