@@ -20,7 +20,7 @@ MedBud Mobile (unofficial) makes medbud.wiki usable on phones. The wiki ships a 
 
 ## Positioning
 
-An independent fix layered on the real site in the visitor's own browser: no proxy, no copy of MedBud's data, no account. It is not affiliated with or endorsed by MedBud.
+An independent fix layered on the real site in the visitor's own browser: no proxy, no copy of MedBud's data, no account. It is not affiliated with or endorsed by MedBud. Care and attention made to not destroy or misplace medbuds displayed advertising.
 
 ## Operating Context
 
