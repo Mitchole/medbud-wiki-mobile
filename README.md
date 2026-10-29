@@ -28,3 +28,8 @@ Open the install guide on your phone: **https://mitchole.github.io/medbud-wiki-m
 Not every MedBud page has been checked on a phone yet. If one looks wrong, please [open an issue](https://github.com/Mitchole/medbud-wiki-mobile/issues/new) with the page's address.
 
 What has changed in each version: [CHANGELOG.md](CHANGELOG.md).
+
+This project was made for a friend who regularly uses medbud, but found it difficult to operate on his smartphone. Shoutout to everyone there. I don't partake myself but I very much support the cause.
+
+## Readme if you work for/represent medbud
+Feel free to take this css/js and apply it to your site. Genuinely. It's yours to take, no attibution needed. Let me know if you do, and I'll happily take this project down.
