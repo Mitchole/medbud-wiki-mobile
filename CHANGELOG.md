@@ -4,6 +4,9 @@ All notable changes to MedBud Mobile (unofficial). The format follows [Keep a Ch
 
 ## [Unreleased]
 
+### Added
+- A step-by-step install guide (`site/index.html`) that detects your phone and browser, with a check that it worked, published to GitHub Pages with the userscript once the repository is public.
+
 ### Changed
 - The logo and a standard three-line menu button sit in a bar that stays at the top while scrolling; the button turns into a close (X) while the menu is open.
 - The top links (Login, Register, Public Charter, Advertising, Volunteers, Contact) move to the foot of the menu, wrapped to fit, instead of a sideways-scrolling row.

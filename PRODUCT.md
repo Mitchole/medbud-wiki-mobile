@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Single static `index.html` (inline CSS and JS, no build step), hosted on GitHub Pages under the `Mitchole` account. The userscript is a plain `.user.js` file served from the same site. An Android APK (WebView wrapper) is a separate deliverable, planned after the web pieces.
+Single static `index.html` (inline CSS and JS, no build step), hosted on GitHub Pages under the `Mitchole` account. The userscript is a plain `.user.js` file served from the same site. An Android APK was planned and then cancelled (2026-10-29).
 
 ## Users
 
@@ -24,7 +24,7 @@ An independent fix layered on the real site in the visitor's own browser: no pro
 
 ## Operating Context
 
-- Install paths: iPhone/iPad via the free Userscripts Safari extension (iOS 15.1+); Android Firefox via Tampermonkey; Android Chrome cannot run userscripts, so the guide offers the APK or switching to Firefox; desktop gets an explanation plus an optional Tampermonkey path; unknown devices see every option.
+- Install paths: iPhone/iPad via the free Userscripts Safari extension (iOS 15.1+); Android Firefox via Tampermonkey; Android Chrome cannot run userscripts, so the guide helps the visitor get Firefox and reopen the guide there; desktop gets an explanation plus an optional Tampermonkey path; unknown devices see every option.
 - The guide detects platform from the user agent and offers a manual "Not your device?" switch.
 - The userscript also runs on the guide's own page and sets `data-medbud-mobile` on `<html>`, which flips the guide to an "installed" state.
 - medbud.wiki sits behind a Cloudflare human check; nothing in this project automates or bypasses it.
@@ -34,8 +34,8 @@ An independent fix layered on the real site in the visitor's own browser: no pro
 
 - The guide is a step-by-step flow with Previous/Next controls, one action per step.
 - Must state clearly that it is unofficial and not affiliated with MedBud. Must not use MedBud's logo, wordmark, or styling in a way that reads as MedBud's own page.
-- No analytics, cookies, or third-party requests beyond what the install steps link to (App Store, Firefox Add-ons, the userscript, the APK).
-- Undecided: APK distribution details (GitHub Releases is assumed), exact illustration approach for steps.
+- No analytics, cookies, or third-party requests beyond what the install steps link to (App Store, Firefox Add-ons, Google Play for Firefox, Tampermonkey, the userscript) and the GitHub issues link for reporting pages that look wrong.
+- Undecided: whether steps get drawn illustrations of the iOS/Android settings screens.
 
 ## Brand Commitments
 

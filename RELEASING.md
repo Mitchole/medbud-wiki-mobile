@@ -35,8 +35,10 @@ Once GitHub Pages is serving the files, installed copies pick the new version up
 
 GitHub Pages stays off while the repository is private. Until it is public, `@updateURL` and `@downloadURL` (`https://mitchole.github.io/medbud-wiki-mobile/...`) do not resolve and nothing updates automatically; install by hand from a local copy.
 
-## Android app (APK)
+## The website (GitHub Pages)
 
-Covered by the APK plan, which comes after the install guide. In short: each app release bumps `versionCode` and `versionName`, is signed with the release keystore, and is attached to a GitHub Release. App users get userscript fixes without updating the app, because the app downloads the userscript itself.
+The install guide (`site/`), the userscript and `medbud-mobile.meta.js` are published together by `.github/workflows/pages.yml` on every push to `main`. The workflow runs the release-tooling tests, then `node scripts/build-pages.mjs _site`, which refuses to build if `medbud-mobile.meta.js` is out of date with the userscript, so regenerate it (step 3 above) before pushing.
 
-The signing keystore is created by you, kept outside the repository and backed up. If it is lost, no future APK can update the installed app; every user would have to uninstall and reinstall.
+To preview the guide locally, serve the repository root (for example `python -m http.server 8765`) and open `http://127.0.0.1:8765/site/`.
+
+Pages is enabled once the repository is public: Settings, Pages, Source: GitHub Actions. The first run after that publishes `https://mitchole.github.io/medbud-wiki-mobile/`.
