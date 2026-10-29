@@ -74,6 +74,8 @@ test.describe('formulary', () => {
     await expect(controls).toBeVisible();
     await expect(button).toHaveAttribute('aria-expanded', 'true');
     expect((await controls.boundingBox())!.width).toBeGreaterThanOrEqual((await innerWidth(page)) - 40);
+    const ranges = await controls.locator('input[type=range]').evaluateAll((r) => r.map((e) => e.getBoundingClientRect().height));
+    expect(Math.min(...ranges)).toBeGreaterThanOrEqual(44);
   });
 });
 

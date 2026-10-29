@@ -208,6 +208,7 @@
   }
   ${S} .mbm-filters-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset: 2px; }
   ${S} #mb-grid .mb-controls { float: none !important; width: auto !important; max-width: none !important; }
+  ${S} #mb-grid .mb-controls input[type=range] { height: 44px !important; }
   ${S} #mb-grid:not(.mbm-filters-open) .mb-controls { display: none !important; }
   ${S} #mb-grid .mb-rows { float: none !important; width: auto !important; margin: 0 !important; }
   ${S} #mb-grid .mb-row:not(.mb-head):not(.mb-hidden) {
@@ -339,6 +340,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   ${R} > td[data-mbm-role=name] a { width: auto !important; max-width: 100% !important; white-space: normal !important; }
   ${R} > td[data-mbm-role=meta] { grid-area: meta; margin-top: 2px; }
   ${R} > td[data-mbm-role=meta2] { grid-area: meta2; margin-top: 2px; }
+  ${R} > td[data-mbm-role=meta2] i { margin-right: 6px; }
   ${R} > td:is([data-mbm-role=meta], [data-mbm-role=meta2]) br { display: none; }
   ${R} > td[data-mbm-role=meta] > span { display: flex; flex-wrap: wrap; align-items: center; column-gap: 10px; row-gap: 2px; }
   ${R} > td[data-mbm-role=meta] .subspecies { font-weight: 600; }

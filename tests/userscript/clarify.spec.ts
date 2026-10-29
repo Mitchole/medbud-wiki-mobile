@@ -71,3 +71,11 @@ test('clinic details are labelled', async ({ page }) => {
   expect(await label('pharmacy')).toContain('Default pharmacy');
   expect(await label('contact')).toContain('Contact');
 });
+
+test('clinic consultation icons do not overlap their text', async ({ page }) => {
+  test.skip(!fixturesAvailable('clinics'), 'clinics fixture missing');
+  await openMedbud(page, 'clinics');
+  const gap = await page.locator('table#clinics > tbody > tr').first().locator('> [data-mbm-role=meta2] i').first()
+    .evaluate((i) => parseFloat(getComputedStyle(i).marginRight));
+  expect(gap).toBeGreaterThanOrEqual(4);
+});
