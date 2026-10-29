@@ -99,6 +99,20 @@
   ${S} a.button span { white-space: normal !important; }
   ${S} main p a { white-space: normal !important; }
   ${S} .mbm-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+
+  /* Readable text: body copy at least 14px, nothing under 12px. Links, abbr and .quiet inside small inherit. */
+  ${S} main :is(p, li, td) { font-size: max(14px, 1em) !important; }
+  ${S} small { font-size: max(12px, 0.85em) !important; }
+}
+
+@media (max-width: 1023px) and (pointer: coarse) {
+  /* 44px touch targets, grown with padding and alignment, not bigger type. */
+  ${S} :is(.top-links a, nav.breadcrumbs a, table#clinics td a.button) {
+    display: inline-flex !important; align-items: center; min-height: 44px; box-sizing: border-box;
+  }
+  ${S} header nav .menuEllipsis__elem > a { display: flex !important; align-items: center; min-height: 44px; box-sizing: border-box; }
+  ${S} :is(form#search button, form#search input[type=search]) { min-height: 44px; }
+  ${S} :is(button.calcStrain, button.pdfStrain) { min-width: 44px; min-height: 44px; }
 }
 `;
 

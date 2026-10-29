@@ -98,6 +98,19 @@ export async function openMedbud(page: Page, name: PageName, opts: OpenOptions =
   await page.goto(PAGES[name], { waitUntil: 'load' });
 }
 
+/** Controls the audit found under 44px on phones. Selectors with no visible match on a page are skipped. */
+export const TAP_TARGETS = [
+  '.top-links a',
+  'nav.breadcrumbs a',
+  'header nav .menuEllipsis__elem > a',
+  'form#search button',
+  'form#search input[type=search]',
+  'button.calcStrain',
+  'button.pdfStrain',
+  'table#clinics td a.button',
+  '.mbm-more',
+] as const;
+
 export async function horizontalOverflow(page: Page): Promise<number> {
   return page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
 }
