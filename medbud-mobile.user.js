@@ -105,6 +105,59 @@
   ${S} small { font-size: max(12px, 0.85em) !important; }
 }
 
+${S} td[data-mbm-role=toggle] { display: none; }
+
+@media (max-width: 767px) {
+  /* Data tables as cards: name first, one meta line, the comparison number strongest, details on demand. */
+  ${S} table.mbm-cards, ${S} table.mbm-cards tbody { display: block; width: 100% !important; border: 0; }
+  ${S} table.mbm-cards thead { display: none; }
+  ${S} table.mbm-cards tbody tr {
+    display: grid; grid-template-columns: 52px minmax(0, 1fr) auto;
+    grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "toggle toggle toggle";
+    column-gap: 14px; row-gap: 2px; padding: 14px 14px 0; margin: 0 0 10px;
+    border-radius: .5rem; height: auto !important; background: rgba(255, 255, 255, .035);
+  }
+  ${S} table.mbm-cards tbody tr.mbm-open {
+    grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "gen gen gen" "terps terps terps" "actions actions actions" "toggle toggle toggle";
+  }
+  ${S} table.mbm-cards td {
+    display: block; padding: 0 !important; border: 0 !important; width: auto !important; height: auto !important;
+    min-width: 0; text-align: left !important; background: none !important;
+  }
+  ${S} table.mbm-cards tr:is(:hover, :active) td { background: none !important; }
+  ${S} table.mbm-cards td:empty:not([data-mbm-role=toggle]) { display: none; }
+  ${S} table.mbm-cards td[data-mbm-role=thumb] { grid-area: thumb; align-self: start; }
+  ${S} table.mbm-cards td[data-mbm-role=thumb] img { width: 52px !important; height: 52px !important; object-fit: contain; border-radius: .33rem; }
+  ${S} table.mbm-cards td:is([data-mbm-role=thumb2], [data-mbm-role=altprice], [data-mbm-role=packs]) { display: none; }
+  ${S} table.mbm-cards td[data-mbm-role=name] { grid-area: name; line-height: 1.3; }
+  ${S} table.mbm-cards td[data-mbm-role=name] > a:first-child { display: block; font-size: 1.0625rem; font-weight: 600; max-width: none !important; padding: 2px 0; }
+  ${S} table.mbm-cards td[data-mbm-role=name] small { opacity: .75; }
+  ${S} table.mbm-cards td[data-mbm-role=meta] { grid-area: meta; margin-top: 2px; }
+  ${S} table.mbm-cards td[data-mbm-role=meta] br { display: none; }
+  ${S} table.mbm-cards td[data-mbm-role=meta] > span { display: flex; flex-wrap: wrap; align-items: center; column-gap: 10px; row-gap: 2px; }
+  ${S} table.mbm-cards td[data-mbm-role=meta] .subspecies { font-weight: 600; }
+  ${S} table.mbm-cards td[data-mbm-role=ppg] { grid-area: price; margin-top: 14px; }
+  ${S} table.mbm-cards td[data-mbm-role=ppg] br { display: none; }
+  ${S} table.mbm-cards td[data-mbm-role=ppg] > span { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
+  ${S} table.mbm-cards td[data-mbm-role=ppg] > span > span { display: flex; align-items: baseline; gap: 8px; font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  ${S} table.mbm-cards td[data-mbm-role=ppg] > span > span small { font-weight: 400; opacity: .7; }
+  ${S} table.mbm-cards td[data-mbm-role=stock] { grid-area: stock; margin-top: 14px; justify-self: end; align-self: center; text-align: right !important; }
+  ${S} table.mbm-cards td[data-mbm-role=stock] .quiet { display: block; margin-top: 4px; }
+  ${S} table.mbm-cards td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions]) { display: none; }
+  ${S} table.mbm-cards tr.mbm-open td[data-mbm-role=genetics] { display: block; grid-area: gen; margin-top: 14px; padding-top: 14px !important; border-top: 1px solid rgba(255, 255, 255, .08) !important; }
+  ${S} table.mbm-cards tr.mbm-open td[data-mbm-role=terps] { display: block; grid-area: terps; margin-top: 10px; }
+  ${S} table.mbm-cards tr.mbm-open td[data-mbm-role=actions] { display: flex; grid-area: actions; gap: 8px; margin-top: 10px; }
+  ${S} table.mbm-cards td[data-mbm-role=actions] br { display: none; }
+  ${S} table.mbm-cards td[data-mbm-role=toggle] { display: block; grid-area: toggle; margin: 8px -14px 0; }
+  ${S} table.mbm-cards button.mbm-more {
+    all: unset; box-sizing: border-box; width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: .875rem; color: inherit; opacity: .85; border-top: 1px solid rgba(255, 255, 255, .08); cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, .08);
+  }
+  ${S} table.mbm-cards button.mbm-more:focus-visible { outline: 2px solid #b5e853; outline-offset: -2px; }
+  ${S} table.mbm-cards tr.mbm-open button.mbm-more i { transform: rotate(180deg); }
+}
+
 @media (max-width: 1023px) and (pointer: coarse) {
   /* 44px touch targets, grown with padding and alignment, not bigger type. */
   ${S} :is(.top-links a, nav.breadcrumbs a, table#clinics td a.button) {
@@ -137,11 +190,109 @@
     });
   }
 
+  // ---- Cards -------------------------------------------------------------
+
+  /** Roles whose cells only show once a card's Details are open. A row with any of them gets a toggle. */
+  const DETAIL_ROLES = ['genetics', 'terps', 'actions'];
+
+  /** Strains list rows (table.product): positional cells plus the site's own price/terps classes. */
+  function STRAIN_ROLES(tr) {
+    const cells = [...tr.children];
+    const tag = (td, role) => { if (td) td.dataset.mbmRole = role; };
+    tag(cells[0], 'thumb');
+    tag(cells[1], 'thumb2');
+    tag(cells[2], 'name');
+    tag(cells[3], 'meta');
+    tag(cells[4], 'genetics');
+    cells.forEach((td) => {
+      if (td.classList.contains('terps')) tag(td, 'terps');
+      else if (td.classList.contains('priceGram')) tag(td, 'ppg');
+      else if (td.classList.contains('priceBreakdown')) tag(td, 'packs');
+      else if (/price/i.test(td.className)) tag(td, 'altprice');
+      else if (td.querySelector('.availability')) tag(td, 'stock');
+      else if (td.querySelector('button.calcStrain, button.pdfStrain')) tag(td, 'actions');
+    });
+  }
+
+  const CARD_TABLES = [{ selector: 'table.product', roles: STRAIN_ROLES }];
+  const cardQuery = matchMedia('(max-width: 767px)');
+
+  function addToggle(tr) {
+    const td = document.createElement('td');
+    td.dataset.mbmRole = 'toggle';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mbm-more';
+    button.setAttribute('aria-expanded', 'false');
+    const label = document.createElement('span');
+    label.textContent = 'Details';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-chevron-down';
+    icon.setAttribute('aria-hidden', 'true');
+    button.append(label, icon);
+    td.appendChild(button);
+    tr.appendChild(td);
+  }
+
+  /** Tag every not-yet-seen row's cells with their roles and give it a Details toggle when it has details. */
+  function cardify(table, roles) {
+    table.querySelectorAll(':scope > tbody > tr').forEach((tr) => {
+      if (tr.dataset.mbm || tr.children.length < 2) return;
+      tr.dataset.mbm = '1';
+      roles(tr);
+      const hasDetails = [...tr.children].some((td) => DETAIL_ROLES.includes(td.dataset.mbmRole) && td.textContent.trim() + td.innerHTML.trim());
+      if (hasDetails) addToggle(tr);
+    });
+  }
+
+  /** Rows the site adds later (sorting, filtering, loading more) become cards too. */
+  function observeTable(table, roles) {
+    const observer = new MutationObserver(() => cardify(table, roles));
+    table.querySelectorAll(':scope > tbody').forEach((tbody) => observer.observe(tbody, { childList: true }));
+  }
+
+  /** One listener per table, so it keeps working when the site re-renders rows. */
+  function bindToggles(table) {
+    table.addEventListener('click', (event) => {
+      const button = event.target.closest('button.mbm-more');
+      if (!button || !table.contains(button)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const open = button.closest('tr').classList.toggle('mbm-open');
+      button.setAttribute('aria-expanded', String(open));
+      button.querySelector('span').textContent = open ? 'Hide details' : 'Details';
+    });
+  }
+
+  /** Cards in portrait-width screens, sideways-scrolling tables otherwise; re-run on rotation. */
+  function setupCards() {
+    CARD_TABLES.forEach(({ selector, roles }) => {
+      document.querySelectorAll(selector).forEach((table) => {
+        if (!table.dataset.mbmBound) {
+          table.dataset.mbmBound = '1';
+          cardify(table, roles);
+          observeTable(table, roles);
+          bindToggles(table);
+        }
+        const wrap = table.parentElement;
+        if (cardQuery.matches) {
+          table.classList.add('mbm-cards');
+          if (wrap && wrap.classList.contains('mbm-scroll')) wrap.replaceWith(table);
+        } else {
+          table.classList.remove('mbm-cards');
+          wrapWideTables(table.parentNode);
+        }
+      });
+    });
+  }
+
   function onReady() {
     // The style may have landed in <html> before <head> existed; move it so it sits after the site's CSS.
     const style = document.getElementById('medbud-mobile-css');
     if (style && document.head && style.parentNode !== document.head) document.head.appendChild(style);
+    setupCards();
     wrapWideTables(document);
+    cardQuery.addEventListener('change', setupCards);
   }
 
   fixViewport();

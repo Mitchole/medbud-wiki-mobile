@@ -53,6 +53,8 @@ export interface OpenOptions {
   times?: number;
   /** Replace the fixture HTML before it is served. */
   transformHtml?: (html: string) => string;
+  /** Start as a visitor who already accepted the site's notice, so its popup does not cover the page (default true). */
+  consented?: boolean;
 }
 
 /** Route every request for a medbud.wiki page to local fixtures; nothing reaches the network. */
@@ -94,6 +96,13 @@ export async function addUserscript(page: Page, times = 1): Promise<void> {
 
 export async function openMedbud(page: Page, name: PageName, opts: OpenOptions = {}): Promise<void> {
   await routeMedbud(page, opts);
+  if (opts.consented !== false) {
+    // The cookies the site sets after "Accept & Proceed" with analytics declined.
+    await page.context().addCookies([
+      { name: 'consent-access', value: '1', domain: 'medbud.wiki', path: '/' },
+      { name: 'consent-analytics', value: '0', domain: 'medbud.wiki', path: '/' },
+    ]);
+  }
   if (opts.userscript !== false) await addUserscript(page, opts.times ?? 1);
   await page.goto(PAGES[name], { waitUntil: 'load' });
 }
