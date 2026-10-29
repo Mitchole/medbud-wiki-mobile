@@ -101,6 +101,8 @@
   .caution span { display: block; margin-bottom: 2px; font: 700 .6875rem/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 
   .dir .notfound { margin-top: 14px; padding: 10px 12px; border: var(--rule); border-radius: 4px; font-weight: 700; font-size: 1rem; line-height: 1.4; }
+  .ipad-note { display: none; }
+  html[data-device="ipad"] .ipad-note { display: block; font-weight: 700; }
   .dir .report { margin-top: 16px; font-size: .9375rem; color: var(--ink-soft); }
   /* Installed: the label carries the caveat itself, and there is nowhere left to go but MedBud. */
   body[data-at="installed"] .caveat { display: none; }
@@ -210,6 +212,7 @@
     <h2 id="ios-1-t" tabindex="-1">Get the Userscripts app</h2>
     <div class="row"><span class="k">For</span><span class="v">iPhone or iPad, using Safari</span></div>
     <div class="dir"><ol><li>Tap <b>Open the App Store</b> below.</li><li>Tap <b>Get</b>. The Userscripts app is free.</li><li>Come back to this page.</li></ol>
+      <p class="ipad-note">On an iPad, MedBud already shows its full layout, so this changes nothing there: it is made for iPhone.</p>
       <p class="act"><a class="act-btn" href="https://apps.apple.com/app/userscripts/id1463298887">Open the App Store</a></p>
     </div>
     <p class="caution"><span>Important</span>Needs iOS 15.1 or later. It&rsquo;s free.</p>
@@ -252,6 +255,22 @@
   </article>
 </section>
 </div>
+<div class="path" data-path="safari">
+<h1 class="path-name">On an iPhone, in another browser or app</h1>
+<section class="step" id="safari-1" data-path="safari" data-step="1" data-total="1" aria-labelledby="safari-1-t">
+  <article class="label">
+    <div class="head"><span>Step 1 of 1</span><span>About 1 min</span></div>
+    <h2 id="safari-1-t" tabindex="-1">Open this guide in Safari</h2>
+    <div class="row"><span class="k">For</span><span class="v">iPhone, in another browser or app</span></div>
+    <div class="dir"><ol><li>Tap <b>Copy link</b> below.</li><li>Open <b>Safari</b>.</li><li>Paste the link into the address bar and go.</li></ol>
+      <p class="act"><button type="button" class="act-btn" data-copy="https://mitchole.github.io/medbud-wiki-mobile/">Copy link</button></p>
+      <p class="link-text">https://mitchole.github.io/medbud-wiki-mobile/</p>
+    </div>
+    <p class="caution"><span>Important</span>The Userscripts app only works in Safari, so the next steps happen there.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Carry on in Safari</span></div>
+  </article>
+</section>
+</div>
 <div class="path" data-path="firefox">
 <h1 class="path-name">On Android, with Firefox</h1>
 <section class="step" id="firefox-1" data-path="firefox" data-step="1" data-total="3" aria-labelledby="firefox-1-t">
@@ -259,7 +278,7 @@
     <div class="head"><span>Step 1 of 3</span><span>About 1 min</span></div>
     <h2 id="firefox-1-t" tabindex="-1">Add Tampermonkey to Firefox</h2>
     <div class="row"><span class="k">For</span><span class="v">Android, using Firefox</span></div>
-    <div class="dir"><ol><li>Tap <b>Open Firefox Add-ons</b> below.</li><li>Tap <b>Add to Firefox</b>.</li><li>Tap <b>Add</b> when Firefox asks.</li></ol>
+    <div class="dir"><ol><li>Tap <b>Open Firefox Add-ons</b> below.</li><li>Tap <b>Add to Firefox</b>.</li><li>Tap <b>Add</b> when Firefox asks.</li><li>Come back to this page.</li></ol>
       <p class="act"><a class="act-btn" href="https://addons.mozilla.org/android/addon/tampermonkey/">Open Firefox Add-ons</a></p>
     </div>
     <p class="caution"><span>Important</span>Tap Add when Firefox asks for permissions: it needs them to fix the pages.</p>
@@ -363,6 +382,8 @@
     <div class="row"><span class="k">Checked</span><span class="v" id="installed-date"></span></div>
     <div class="dir">
       <p>MedBud now fits your phone. Updates arrive by themselves: Tampermonkey checks every day; in the Userscripts app, open its menu and check for updates now and then.</p>
+      <p>Open MedBud in the browser you installed it in: Safari on iPhone, Firefox on Android.</p>
+      <p class="ipad-note">On an iPad, MedBud keeps its full layout; the fix shows on iPhone.</p>
       <p class="act"><a class="act-btn" href="https://medbud.wiki/">Open MedBud</a></p>
       <p class="report">Not every MedBud page has been checked yet. If a page looks wrong on your phone, please <a href="https://github.com/Mitchole/medbud-wiki-mobile/issues/new">report it on GitHub</a> with the page&rsquo;s address.</p>
     </div>
@@ -382,9 +403,15 @@
   var root = document.documentElement;
   root.classList.add('js');
 
-  /** Which install path suits this browser: ios, firefox, android, desktop or unknown. */
+  if (/iPad/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)) root.dataset.device = 'ipad';
+
+  /** Which install path suits this browser: ios, safari (iOS but not Safari), firefox, android, desktop or unknown. */
   function detect(ua, touchPoints) {
-    if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1)) return 'ios';
+    var ipad = /iPad/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1);
+    if (/iPhone|iPod/.test(ua) || ipad) {
+      // Userscripts only runs in Safari: Chrome, Firefox, Edge, Opera and in-app browsers (chat and social apps).
+      return /CriOS|FxiOS|EdgiOS|OPiOS|FBAN|FBAV|Instagram|Line\/|GSA\//.test(ua) ? 'safari' : 'ios';
+    }
     if (/Android/.test(ua)) return /Firefox\//.test(ua) ? 'firefox' : 'android';
     if (/Windows NT|Macintosh|X11|CrOS/.test(ua)) return 'desktop';
     return 'unknown';
@@ -425,7 +452,7 @@
       document.getElementById('installed-date').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     }
     back.disabled = step.dataset.key === 'installed' || (isPath ? n === 1 : !previous);
-    next.hidden = !isPath || (last && (step.dataset.path === 'desktop' || step.dataset.path === 'android'));
+    next.hidden = !isPath || (last && (step.dataset.path === 'desktop' || step.dataset.path === 'android' || step.dataset.path === 'safari'));
     next.textContent = step.hasAttribute('data-check') ? 'Check now' : (step.dataset.nextLabel || 'Done, next step');
     // A bar holding only a disabled Back says nothing: drop it (chooser on arrival, installed).
     document.querySelector('.bar').hidden = back.disabled && next.hidden;
@@ -513,10 +540,23 @@
   barHeight();
   route(true);
 
+  // A Safari extension may inject the userscript after this script has run: flip to installed when it lands.
+  if (window.MutationObserver) {
+    new MutationObserver(function () { if (installedVersion() && current && current.dataset.key !== 'installed') route(false); })
+      .observe(root, { attributes: true, attributeFilter: ['data-medbud-mobile'] });
+  }
+
   var checked = false;
   try { checked = sessionStorage.getItem('mbm-check') === '1'; sessionStorage.removeItem('mbm-check'); } catch (e) { /* ignore */ }
-  if (checked && current && current.hasAttribute('data-check')) {
-    current.querySelector('.notfound').hidden = false;
+  if (checked) {
+    // Give a late-injected userscript time to mark the page before saying it was not found.
+    var notFound = function () {
+      setTimeout(function () {
+        if (!installedVersion() && current && current.hasAttribute('data-check')) current.querySelector('.notfound').hidden = false;
+      }, 800);
+    };
+    if (document.readyState === 'complete') notFound();
+    else window.addEventListener('load', notFound);
   }
 })();
 </script>

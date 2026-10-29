@@ -116,8 +116,8 @@ test.describe('install guide behaviour', () => {
   test('Check now finds the script once it runs', async ({ browser }, info) => {
     const page = await guidePage(browser, info, UA.androidFirefox);
     await openGuide(page, { hash: 'firefox-3' });
+    // The guide watches for the userscript's mark, so it flips without the visitor tapping Check now.
     await page.evaluate(() => { document.documentElement.dataset.medbudMobile = '0.1.0'; });
-    await page.getByRole('button', { name: 'Check now' }).click();
     await expect(heading(page)).toHaveText('MedBud Mobile is installed');
     await page.context().close();
   });
@@ -234,6 +234,63 @@ test.describe('finish review fixes', () => {
     for (const d of dirs) expect(caution).not.toContain(d.replace(/\.$/, ''));
     await openGuide(page, { hash: 'desktop-2' });
     await expect(page.locator('.step:visible .dir')).not.toContainText('Tap');
+    await page.context().close();
+  });
+});
+
+test.describe('final review fixes', () => {
+  test.beforeEach(({}, info) => test.skip(info.project.name === 'iphone-landscape', 'portrait and desktop are enough'));
+
+  test('a userscript that marks the page late still flips it to installed', async ({ browser }, info) => {
+    const page = await guidePage(browser, info, UA.iphone);
+    await page.addInitScript(() => {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(() => { document.documentElement.dataset.medbudMobile = '0.1.0'; }, 400));
+    });
+    await openGuide(page, { hash: 'ios-4' });
+    await expect(heading(page)).toHaveText('MedBud Mobile is installed');
+    await expect(page.locator('.notfound:visible')).toHaveCount(0);
+    await page.context().close();
+  });
+
+  test('an iPad is told the fix is made for iPhone', async ({ browser }, info) => {
+    const ipad = await guidePage(browser, info, UA.macSafari);
+    await ipad.addInitScript(() => Object.defineProperty(Navigator.prototype, 'maxTouchPoints', { get: () => 5 }));
+    await openGuide(ipad);
+    await expect(ipad.locator('.step:visible .ipad-note')).toBeVisible();
+    await expect(ipad.locator('.step:visible .ipad-note')).toContainText(/iPad/);
+    await ipad.context().close();
+    const phone = await guidePage(browser, info, UA.iphone);
+    await openGuide(phone);
+    await expect(phone.locator('.step:visible .ipad-note')).toBeHidden();
+    await phone.context().close();
+  });
+
+  for (const [name, ua] of [
+    ['Chrome on iPhone', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.6723.90 Mobile/15E148 Safari/604.1'],
+    ['a chat app on iPhone', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBAV/480.0.0.0]'],
+  ] as const) {
+    test(`${name} is sent to Safari first`, async ({ browser }, info) => {
+      const page = await guidePage(browser, info, ua);
+      await openGuide(page);
+      await expect(heading(page)).toHaveText('Open this guide in Safari');
+      await expect(page.locator('.step:visible [data-copy]')).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Done, next step' })).toBeHidden();
+      await page.context().close();
+    });
+  }
+
+  test('firefox-1 says to come back to the guide', async ({ browser }, info) => {
+    const page = await guidePage(browser, info, UA.androidFirefox);
+    await openGuide(page);
+    await expect(page.locator('.step:visible .dir li').last()).toContainText(/come back to this page/i);
+    await page.context().close();
+  });
+
+  test('the installed state names the browser to open MedBud in', async ({ browser }, info) => {
+    const page = await guidePage(browser, info, UA.iphone);
+    await openGuide(page, { installed: '0.1.0' });
+    await expect(page.locator('.step:visible')).toContainText(/Safari on iPhone/);
+    await expect(page.locator('.step:visible')).toContainText(/Firefox on Android/);
     await page.context().close();
   });
 });

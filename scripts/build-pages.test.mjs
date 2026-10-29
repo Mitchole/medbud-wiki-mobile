@@ -37,3 +37,16 @@ test('refuses to build when the meta file version does not match', () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('refuses an output folder that would delete the repository or the guide source', () => {
+  for (const bad of ['.', '..', 'site', 'site/fonts']) {
+    assert.throws(() => buildPages(bad), /refus/i, bad);
+  }
+  assert.ok(existsSync(path.join(ROOT, 'site', 'index.html')), 'site/ untouched');
+});
+
+test('the Pages workflow is skipped while the repository is private', () => {
+  const workflow = readFileSync(path.join(ROOT, '.github', 'workflows', 'pages.yml'), 'utf8');
+  const build = workflow.slice(workflow.indexOf('  build:'), workflow.indexOf('  deploy:'));
+  assert.match(build, /if: \$\{\{ !github\.event\.repository\.private \}\}/);
+});

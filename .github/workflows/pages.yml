@@ -1,6 +1,6 @@
 # Publishes the install guide, the userscript and its meta file to GitHub Pages.
-# Pages stays switched off until the repository is public; this runs once it is enabled
-# (Settings > Pages > Source: GitHub Actions).
+# Pages stays switched off until the repository is public: while it is private the jobs are skipped.
+# Once public, enable Pages (Settings > Pages > Source: GitHub Actions).
 name: Pages
 
 on:
@@ -19,6 +19,8 @@ concurrency:
 
 jobs:
   build:
+    # Skipped (not failed) while the repository is private and Pages is off; deploy then skips too.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
