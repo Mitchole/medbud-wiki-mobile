@@ -1,0 +1,10 @@
+node_modules/
+test-results/
+playwright-report/
+tests/fixtures/pages/
+tests/fixtures/assets/
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/config.local.json
+.idea/
+.superpowers/

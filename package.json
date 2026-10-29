@@ -1,0 +1,13 @@
+{
+  "name": "medbud-wiki-mobile",
+  "private": true,
+  "type": "module",
+  "description": "MedBud Mobile (unofficial): mobile fixes for medbud.wiki",
+  "scripts": {
+    "test": "playwright test",
+    "test:unit": "node --test scripts/"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}
