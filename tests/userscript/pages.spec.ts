@@ -76,3 +76,49 @@ test.describe('formulary', () => {
     expect((await controls.boundingBox())!.width).toBeGreaterThanOrEqual((await innerWidth(page)) - 40);
   });
 });
+
+test.describe('pharmacies directory', () => {
+  test.skip(!fixturesAvailable('pharmacies'), 'pharmacies fixture missing');
+
+  test('pharmacies render as cards with notes folded in', async ({ page }) => {
+    await openMedbud(page, 'pharmacies');
+    const stats = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll('table#pharmacies > tbody > tr')];
+      return {
+        pharmacies: rows.filter((tr) => tr.querySelector(':scope > [data-mbm-role=name]')).length,
+        shown: rows.filter((tr) => getComputedStyle(tr).display !== 'none').length,
+      };
+    });
+    expect(stats.pharmacies).toBeGreaterThan(10);
+    expect(stats.shown).toBe(stats.pharmacies);
+    const row = page.locator('table#pharmacies > tbody > tr').first();
+    expect(await row.evaluate((tr) => getComputedStyle(tr).display)).toBe('grid');
+    await expect(row.locator('> [data-mbm-role=name]')).toContainText('IPS Pharma');
+    await expect(row.locator('> [data-mbm-role=meta]')).toContainText('Available');
+    await expect(row.locator('> [data-mbm-role=contact]')).toBeHidden();
+    await row.locator('.mbm-more').tap();
+    await expect(row.locator('> [data-mbm-role=contact]')).toBeVisible();
+    await expect(row.locator('> [data-mbm-role=notes]')).toBeVisible();
+  });
+});
+
+for (const [name, noun] of [['producers', 'medications'], ['breeders', 'cultivars']] as const) {
+  test.describe(`${name} directory`, () => {
+    test.skip(!fixturesAvailable(name), `${name} fixture missing`);
+
+    test(`${name} render as cards with a ${noun} count`, async ({ page }) => {
+      await openMedbud(page, name);
+      // The first row with any items, so the count is not zero.
+      const row = page.locator('table#producers > tbody > tr').filter({ has: page.locator('[data-mbm-role=items] a') }).first();
+      expect(await row.evaluate((tr) => getComputedStyle(tr).display)).toBe('grid');
+      await expect(row.locator('> [data-mbm-role=name]')).toBeVisible();
+      await expect(row.locator('> [data-mbm-role=count]')).toContainText(new RegExp(`\\d+ ${noun.slice(0, -1)}s?`));
+      await expect(row.locator('> [data-mbm-role=items]')).toBeHidden();
+      await row.locator('.mbm-more').tap();
+      await expect(row.locator('> [data-mbm-role=items]')).toBeVisible();
+      const link = row.locator('> [data-mbm-role=items] a').first();
+      const size = await link.evaluate((a) => ({ h: parseFloat(getComputedStyle(a).minHeight), w: a.getBoundingClientRect().width }));
+      expect(size.h).toBeGreaterThanOrEqual(44);
+    });
+  });
+}

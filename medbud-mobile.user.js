@@ -197,6 +197,26 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     grid-template-areas: "name price" "meta meta" "meta2 meta2" "price2 price2" "pricing pricing" "notes notes" "pharmacy pharmacy" "contact contact" "ratings ratings" "toggle toggle";
   }
 
+  /* Pharmacies directory: name, formulary count and delivery up front; contact, brands and notes in Details. */
+  ${S} table#pharmacies.mbm-cards > tbody > tr {
+    grid-template-columns: minmax(0, 1fr); grid-template-areas: "name" "meta" "meta2" "toggle";
+  }
+  ${S} table#pharmacies.mbm-cards > tbody > tr.mbm-open {
+    grid-template-areas: "name" "meta" "meta2" "notes" "contact" "brands" "brands2" "ratings" "toggle";
+  }
+
+  /* Producers and breeders: logo, name and a count; the medications or cultivars themselves in Details. */
+  ${S} table#producers.mbm-cards > tbody > tr {
+    grid-template-areas: "thumb name name" "thumb count count" "toggle toggle toggle";
+  }
+  ${S} table#producers.mbm-cards > tbody > tr.mbm-open {
+    grid-template-areas: "thumb name name" "thumb count count" "items items items" "contact contact contact" "toggle toggle toggle";
+  }
+  ${R} > td[data-mbm-role=count] { grid-area: count; font-size: .875rem; margin-top: 2px; }
+  ${R} > td[data-mbm-role=items] a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
+  ${R} > td[data-mbm-role=items] img { max-height: 44px; width: auto !important; }
+  ${R} > td:is([data-mbm-role=brands], [data-mbm-role=brands2]) img { max-height: 32px; width: auto !important; }
+
   ${R} > td[data-mbm-role=thumb] { grid-area: thumb; align-self: start; }
   ${R} > td[data-mbm-role=thumb] img { width: 52px !important; height: 52px !important; object-fit: contain; border-radius: .33rem; }
   ${R} > td:is([data-mbm-role=thumb2], [data-mbm-role=altprice], [data-mbm-role=packs]) { display: none; }
@@ -223,12 +243,16 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   ${R} > td[data-mbm-role=price]::before { content: "First year from"; }
   ${R} > td[data-mbm-role=price2]::before { content: "Each year after"; }
 
-  ${R} > td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions], [data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings], [data-mbm-role=notes]) { display: none; }
+  ${R} > td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions], [data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings], [data-mbm-role=notes], [data-mbm-role=brands], [data-mbm-role=brands2], [data-mbm-role=items]) { display: none; }
   ${O} > td[data-mbm-role=genetics] { display: block; grid-area: gen; margin-top: 14px; padding-top: 14px !important; border-top: 1px solid rgba(255, 255, 255, .08) !important; }
   ${O} > td[data-mbm-role=terps] { display: block; grid-area: terps; margin-top: 10px; }
   ${O} > td[data-mbm-role=actions] { display: flex; grid-area: actions; gap: 8px; margin-top: 10px; }
   ${O} > td:is([data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings], [data-mbm-role=notes]) { display: block; margin-top: 12px; }
   ${O} > td[data-mbm-role=notes] { grid-area: notes; }
+  ${O} > td:is([data-mbm-role=brands], [data-mbm-role=brands2]) { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  ${O} > td[data-mbm-role=brands] { grid-area: brands; }
+  ${O} > td[data-mbm-role=brands2] { grid-area: brands2; }
+  ${O} > td[data-mbm-role=items] { display: flex; flex-wrap: wrap; gap: 8px; grid-area: items; margin-top: 12px; }
   ${O} > td[data-mbm-role=notes] > div + div { margin-top: 6px; }
   ${O} > td[data-mbm-role=price2] { grid-area: price2; font-weight: 700; }
   ${O} > td[data-mbm-role=pricing] { grid-area: pricing; }
@@ -280,7 +304,7 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   // ---- Cards -------------------------------------------------------------
 
   /** Roles whose cells only show once a card's Details are open. A row with any of them gets a toggle. */
-  const DETAIL_ROLES = ['genetics', 'terps', 'actions', 'contact', 'pharmacy', 'pricing', 'price2', 'ratings', 'notes'];
+  const DETAIL_ROLES = ['genetics', 'terps', 'actions', 'contact', 'pharmacy', 'pricing', 'price2', 'ratings', 'notes', 'brands', 'brands2', 'items'];
 
   /** Strains list rows (table.product): positional cells plus the site's own price/terps classes. */
   function STRAIN_ROLES(tr) {
@@ -314,38 +338,27 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     tag(cells[5], 'actions');
   }
 
-  // Clinics table cells by header text (spaces removed, lower case). The last, unlabelled column holds the
-  // CQC ratings, not actions; the pricing cell contains a nested table of fees.
-  const CLINIC_HEADERS = {
-    prescribingclinic: 'name',
-    'contact/companydetails': 'contact',
-    defaultpharmacy: 'pharmacy',
-    pharmacyaccess: 'meta',
-    recurringconsultations: 'meta2',
-    clinicservicepricing: 'pricing',
-    'min.firstyear': 'price',
-    'min.yearlong-term': 'price2',
-    '': 'ratings',
-  };
-
-  function CLINIC_ROLES(tr) {
-    // Each clinic is a main row, an empty spacer row and a notes row (star rating plus dated notes).
-    // The notes are copied into the clinic's own card; in card view the extra rows are hidden.
-    if (tr.classList.contains('notes')) {
-      tr.classList.add('mbm-merged');
-      return;
-    }
-    const table = tr.closest('table');
+  /** Map cells to roles by their column header text (spaces removed, lower case, matched by prefix). */
+  function rolesByHeader(tr, headers) {
     const roles = [];
-    table.querySelectorAll(':scope > thead th').forEach((th) => {
+    tr.closest('table').querySelectorAll(':scope > thead th').forEach((th) => {
       const key = th.textContent.replace(/\s+/g, '').toLowerCase();
-      for (let i = 0; i < (th.colSpan || 1); i++) roles.push(CLINIC_HEADERS[key]);
+      const match = headers.find(([prefix]) => (prefix === '' ? key === '' : key.startsWith(prefix)));
+      for (let i = 0; i < (th.colSpan || 1); i++) roles.push(match ? match[1] : undefined);
     });
     let column = 0;
     [...tr.children].forEach((td) => {
       if (roles[column]) td.dataset.mbmRole = roles[column];
       column += td.colSpan || 1;
     });
+  }
+
+  /**
+   * Directory tables (clinics, pharmacies) give each entry a main row, an empty spacer row and a notes row
+   * (star rating plus dated notes). The notes are copied into the entry's own card; in card view the extra
+   * rows are hidden.
+   */
+  function mergeNotes(tr) {
     let next = tr.nextElementSibling;
     // Spacer rows hold only whitespace, which WebKit does not count as :empty, so tag them here.
     while (next && next.children.length === 0) {
@@ -364,10 +377,60 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     }
   }
 
+  function directoryRoles(headers) {
+    return (tr) => {
+      if (tr.classList.contains('notes')) {
+        tr.classList.add('mbm-merged');
+        return;
+      }
+      rolesByHeader(tr, headers);
+      mergeNotes(tr);
+    };
+  }
+
+  // Clinics: the last, unlabelled column holds CQC ratings, not actions; the pricing cell holds a nested fee table.
+  const CLINIC_ROLES = directoryRoles([
+    ['prescribingclinic', 'name'],
+    ['contact', 'contact'],
+    ['defaultpharmacy', 'pharmacy'],
+    ['pharmacyaccess', 'meta'],
+    ['recurringconsultations', 'meta2'],
+    ['clinicservicepricing', 'pricing'],
+    ['min.firstyear', 'price'],
+    ['min.yearlong-term', 'price2'],
+    ['', 'ratings'],
+  ]);
+
+  // Pharmacies directory (table#pharmacies, not the per-pharmacy menus in table.pharmacy-list).
+  const PHARMACIES_ROLES = directoryRoles([
+    ['dispensingpharmacy', 'name'],
+    ['contact', 'contact'],
+    ['formulary', 'meta'],
+    ['affiliatedbrands', 'brands'],
+    ['distributedbrands', 'brands2'],
+    ['deliverycourier', 'meta2'],
+    ['', 'ratings'],
+  ]);
+
+  /** Producers and breeders share table#producers; their last column lists medications or cultivars. */
+  function PRODUCER_ROLES(tr) {
+    rolesByHeader(tr, [['', 'thumb'], ['producer', 'name'], ['details', 'contact'], ['medications', 'items'], ['cultivars', 'items']]);
+    const table = tr.closest('table');
+    const noun = table.tHead && /cultivars/i.test(table.tHead.textContent) ? 'cultivar' : 'medication';
+    const items = tr.querySelector(':scope > [data-mbm-role=items]');
+    const n = items ? items.querySelectorAll('a').length : 0;
+    const count = document.createElement('td');
+    count.dataset.mbmRole = 'count';
+    count.textContent = n ? `${n} ${noun}${n === 1 ? '' : 's'}` : `No ${noun}s listed`;
+    tr.appendChild(count);
+  }
+
   const CARD_TABLES = [
     { selector: 'table.product', roles: STRAIN_ROLES },
     { selector: 'table.pharmacy-list', roles: PHARMACY_ROLES },
     { selector: 'table#clinics', roles: CLINIC_ROLES },
+    { selector: 'table#pharmacies', roles: PHARMACIES_ROLES },
+    { selector: 'table#producers', roles: PRODUCER_ROLES },
   ];
 
   function addToggle(tr) {
