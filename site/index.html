@@ -6,10 +6,166 @@
 <title>MedBud Mobile (unofficial): install</title>
 <meta name="description" content="Make medbud.wiki fit your phone. A free, unofficial add-on, installed one step at a time.">
 <style>
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .js .path-name { display: none; }
-  .js .step[hidden], [hidden] { display: none !important; }
+  @font-face { font-family: Arimo; font-weight: 400; font-display: swap; src: url(fonts/arimo-latin-400-normal.woff2) format("woff2"); }
+  @font-face { font-family: Arimo; font-weight: 700; font-display: swap; src: url(fonts/arimo-latin-700-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Roboto Mono"; font-weight: 500; font-display: swap; src: url(fonts/roboto-mono-latin-500-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Roboto Mono"; font-weight: 700; font-display: swap; src: url(fonts/roboto-mono-latin-700-normal.woff2) format("woff2"); }
+
+  :root {
+    --bag: #1f6b3a;
+    --on-bag: #ffffff;
+    --on-bag-soft: #d3e8da;
+    --label: #ffffff;
+    --ink: #141414;
+    --ink-soft: #3d3d3d;
+    --rule: 1.5px solid var(--ink);
+    --caution: #f2c200;
+    --radius: 6px;
+    --column: 30rem;
+    --gutter: 20px;
+    --bar-h: 6.5rem;
+    --mono: "Roboto Mono", ui-monospace, "Courier New", monospace;
+    color-scheme: light;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; min-height: 100dvh;
+    background: var(--bag); color: var(--on-bag);
+    font: 400 1rem/1.4 Arimo, Arial, Helvetica, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  ::selection { background: var(--ink); color: var(--label); }
+  :focus { outline: none; }
+  :focus-visible { outline: 3px solid var(--on-bag); outline-offset: 3px; }
+  .label :focus-visible { outline-color: var(--ink); }
+  .label h2:focus-visible { outline-offset: -4px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  [hidden] { display: none !important; }
+
+  /* The column: one label's width, centred on the green on anything wider than a phone. */
+  .top, .meter, main, .caveat { width: 100%; max-width: var(--column); margin-inline: auto; padding-inline: var(--gutter); }
+
+  .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; column-gap: 12px; padding-top: 10px; }
+  .name { margin: 0; font-weight: 700; font-size: 1.125rem; letter-spacing: -0.005em; }
+  .name i { font-style: normal; font-weight: 400; font-size: .875rem; color: var(--on-bag-soft); margin-left: 6px; }
+  .other {
+    display: inline-flex; align-items: center; min-height: 44px; flex: none;
+    color: var(--on-bag); font-size: .9375rem; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px;
+  }
+
+  .meter { display: flex; gap: 6px; margin-top: 10px; }
+  .meter span { flex: 1; height: 6px; border-radius: 1px; background: rgba(255, 255, 255, .28); transition: background-color .24s ease-out; }
+  .meter span.on { background: var(--on-bag); }
+
+  main { padding-top: 20px; }
+
+  /* The dispensing label: ruled fields on white label stock, one caution strip. */
+  .label {
+    background: var(--label); color: var(--ink); border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 10px 24px rgba(8, 32, 16, .32), 0 2px 4px rgba(8, 32, 16, .22);
+  }
+  .label > * { margin: 0; border-bottom: var(--rule); }
+  .label > :last-child { border-bottom: 0; }
+  .head {
+    display: flex; justify-content: space-between; gap: 12px; padding: 14px;
+    font: 700 .75rem/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase;
+  }
+  .label h2 {
+    padding: 16px 14px; font-size: 1.625rem; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em;
+    text-wrap: balance; overflow-wrap: break-word;
+  }
+  .row { display: grid; grid-template-columns: 6rem minmax(0, 1fr); }
+  .k { padding: 13px 0 12px 14px; font: 700 .6875rem/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+  .v { padding: 10px 14px 10px 0; font-size: 1rem; line-height: 1.375; overflow-wrap: break-word; }
+  .dir { padding: 16px 14px; }
+  .dir ol { margin: 0; padding-left: 1.5rem; }
+  .dir li { font-size: 1.1875rem; line-height: 1.47; margin-bottom: 6px; padding-left: 2px; overflow-wrap: break-word; }
+  .dir li:last-child { margin-bottom: 0; }
+  .dir li::marker { font: 700 1rem var(--mono); }
+  .dir p { margin: 0 0 12px; font-size: 1.0625rem; line-height: 1.5; }
+  .dir p:last-child { margin-bottom: 0; }
+
+  .dir .act { margin: 18px 0 2px; }
+  .act-btn {
+    display: flex; align-items: center; justify-content: center; width: 100%; min-height: 3.25rem; padding: 10px 16px;
+    border: 0; border-radius: var(--radius); background: var(--ink); color: var(--label);
+    font: 700 1.0625rem/1.25 Arimo, Arial, sans-serif; text-align: center; text-decoration: none; cursor: pointer;
+    transition: background-color .15s ease-out, transform .1s ease-out;
+  }
+  .act-btn:hover { background: #2c2c2c; }
+  .act-btn:active { transform: translateY(1px); }
+  .dir .link-text { margin-top: 10px; font: 500 .8125rem/1.45 var(--mono); color: var(--ink-soft); overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+
+  .caution { padding: 12px 14px; background: var(--caution); font-weight: 700; font-size: 1rem; line-height: 1.375; }
+  .caution span { display: block; margin-bottom: 2px; font: 700 .6875rem/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+
+  .dir .notfound { margin-top: 14px; padding: 10px 12px; border: var(--rule); border-radius: 4px; font-weight: 700; font-size: 1rem; line-height: 1.4; }
+  .dir .report { margin-top: 16px; font-size: .9375rem; color: var(--ink-soft); }
+  /* Installed: the label carries the caveat itself, and there is nowhere left to go but MedBud. */
+  body[data-at="installed"] .caveat { display: none; }
+  .label a:not(.act-btn):not(.choice) { color: var(--ink); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+
+  /* Chooser: four plain choices, one per line, each a whole-width target. */
+  .choices { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .choice {
+    display: flex; align-items: center; gap: 12px; min-height: 3.5rem; padding: 10px 16px;
+    border: var(--rule); border-radius: var(--radius); color: var(--ink); text-decoration: none;
+    font-weight: 700; font-size: 1.0625rem; line-height: 1.3; transition: background-color .15s ease-out;
+  }
+  .choice::after {
+    content: ""; flex: none; width: 9px; height: 9px; margin-left: auto;
+    border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg);
+  }
+  .choice:hover { background: #f1f1ee; }
+
+  /* Without JavaScript every path is listed, one label after another. */
+  .path-name { margin: 32px 0 12px; font-size: 1.25rem; line-height: 1.25; }
+  html:not(.js) .step + .step { margin-top: 16px; }
+  html.js .path-name { display: none; }
   html:not(.js) .bar, html:not(.js) .meter, html:not(.js) #installed { display: none; }
+
+  .caveat { padding-top: 28px; padding-bottom: calc(var(--bar-h) + 20px + env(safe-area-inset-bottom)); color: var(--on-bag-soft); font-size: .875rem; line-height: 1.5; }
+  .caveat p { margin: 0; max-width: 60ch; }
+  .caveat a { color: var(--on-bag); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  html:not(.js) .caveat { padding-bottom: 32px; }
+
+  /* Back and Done sit at thumb height and never move. */
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px;
+    padding: 16px max(var(--gutter), calc((100vw - var(--column)) / 2 + var(--gutter))) calc(22px + env(safe-area-inset-bottom));
+    background: linear-gradient(to bottom, rgba(31, 107, 58, 0), var(--bag) 16px);
+  }
+  .btn {
+    min-height: 3.5rem; min-width: 0; padding: 8px 22px; border-radius: var(--radius); border: 2px solid transparent;
+    font: 700 1.0625rem/1.2 Arimo, Arial, sans-serif; cursor: pointer; overflow-wrap: anywhere;
+    transition: background-color .15s ease-out, opacity .15s ease-out, transform .1s ease-out;
+  }
+  .btn:active:not(:disabled) { transform: translateY(1px); }
+  .prev { background: transparent; color: var(--on-bag); border-color: rgba(255, 255, 255, .72); }
+  .prev:hover:not(:disabled) { background: rgba(255, 255, 255, .08); }
+  .prev:disabled { opacity: .38; cursor: default; }
+  .next { background: var(--label); color: var(--ink); border-color: var(--label); }
+  .next:hover { background: #e9f3ec; border-color: #e9f3ec; }
+  .bar:has(> .next[hidden]) .prev { grid-column: 1 / -1; }
+
+  /* The signature swap: Done slides the label off to the left and sets the next one down in the same box. */
+  .step.current .label { view-transition-name: label; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  ::view-transition-group(label) { animation-duration: .34s; animation-timing-function: cubic-bezier(.16, 1, .3, 1); }
+  ::view-transition-old(label) { animation: label-off .26s cubic-bezier(.5, 0, .9, .4) both; }
+  ::view-transition-new(label) { animation: label-down .36s cubic-bezier(.16, 1, .3, 1) .08s both; }
+  html.going-back::view-transition-old(label) { animation: label-lift .22s ease-in both; }
+  html.going-back::view-transition-new(label) { animation: label-back .36s cubic-bezier(.16, 1, .3, 1) both; }
+  @keyframes label-off { to { transform: translateX(-115%) rotate(-4deg); } }
+  @keyframes label-down { from { transform: translateY(18px) scale(.97); opacity: 0; } }
+  @keyframes label-lift { to { transform: translateY(10px) scale(.97); opacity: 0; } }
+  @keyframes label-back { from { transform: translateX(-115%) rotate(-4deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+    .meter span, .btn, .act-btn, .choice { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -146,7 +302,7 @@
       <p class="act"><button type="button" class="act-btn" data-copy="https://mitchole.github.io/medbud-wiki-mobile/">Copy link</button></p>
       <p class="link-text">https://mitchole.github.io/medbud-wiki-mobile/</p>
     </div>
-    <p class="caution"><span>Important</span>Paste it into Firefox&rsquo;s address bar.</p>
+    <p class="caution"><span>Important</span>Paste it into Firefox, not Chrome: the next steps only work there.</p>
     <div class="row"><span class="k">Next</span><span class="v">Carry on in Firefox</span></div>
   </article>
 </section>
@@ -256,9 +412,24 @@
     back.disabled = step.id === 'installed' || (isPath ? n === 1 : !previous);
     next.hidden = !isPath || (last && step.dataset.path === 'desktop');
     next.textContent = step.hasAttribute('data-check') ? 'Check now' : (step.dataset.nextLabel || 'Done, next step');
+    // A bar holding only a disabled Back says nothing: drop it (chooser on arrival, installed).
+    document.querySelector('.bar').hidden = back.disabled && next.hidden;
     document.body.dataset.at = step.id;
     var title = step.querySelector('h2').textContent;
     if (!quiet) announce.textContent = isPath ? 'Step ' + n + ' of ' + total + ': ' + title : title;
+  }
+
+  /** Change step with the label swap: slide off left and set down (Back reverses); instant with reduced motion. */
+  function swapTo(id) {
+    var from = current;
+    var to = byId[id] || byId.chooser;
+    var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var change = function () { show(id); window.scrollTo(0, 0); };
+    if (!document.startViewTransition || still || !from || from === to) { change(); return; }
+    var backwards = from.dataset.path === to.dataset.path && Number(to.dataset.step) < Number(from.dataset.step);
+    root.classList.toggle('going-back', backwards || to.id === previous);
+    var transition = document.startViewTransition(change);
+    transition.finished.then(function () { root.classList.remove('going-back'); }, function () { root.classList.remove('going-back'); });
   }
 
   function go(id) {
@@ -268,13 +439,14 @@
 
   function route(quiet) {
     var id = location.hash.slice(1);
-    if (installedVersion() && id !== 'chooser') { show('installed', quiet); return; }
+    var land = quiet ? function (target) { show(target, true); } : swapTo;
+    if (installedVersion() && id !== 'chooser') { land('installed'); return; }
     if (!byId[id] || id === 'installed') {
       var path = detect(navigator.userAgent, navigator.maxTouchPoints || 0);
       id = path === 'unknown' ? 'chooser' : path + '-1';
       history.replaceState(null, '', '#' + id);
     }
-    show(id, quiet);
+    land(id);
   }
 
   next.addEventListener('click', function () {
@@ -311,6 +483,12 @@
   });
 
   window.addEventListener('hashchange', function () { route(false); });
+
+  // The footer keeps clear of the fixed bar whatever its height (large text wraps its labels).
+  var bar = document.querySelector('.bar');
+  function barHeight() { root.style.setProperty('--bar-h', bar.offsetHeight + 'px'); }
+  if (window.ResizeObserver) new ResizeObserver(barHeight).observe(bar);
+  barHeight();
   route(true);
 
   var checked = false;
