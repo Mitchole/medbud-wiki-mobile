@@ -17,15 +17,4 @@ An install guide (one step at a time, for iPhone and Android) is on the way. Unt
 - **Android:** Firefox with the Tampermonkey add-on, then open `medbud-mobile.user.js` from this repository.
 - **iPhone/iPad:** the free Userscripts app for Safari, then open `medbud-mobile.user.js` in Safari and install it from the extension menu.
 
-## Development
-
-```
-npm install
-npx playwright install chromium webkit
-npm test            # Playwright suite (needs page fixtures, see tests/fixtures/README.md)
-npm run test:unit   # release tooling
-```
-
-Tests never contact medbud.wiki: they replay saved copies of its pages.
-
-Releasing and version bumps: see [RELEASING.md](RELEASING.md). Changes: [CHANGELOG.md](CHANGELOG.md).
+What has changed in each version: [CHANGELOG.md](CHANGELOG.md).
