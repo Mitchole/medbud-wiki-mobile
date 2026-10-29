@@ -329,6 +329,19 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   ${R} > td[data-mbm-role=items] img { max-height: 44px; width: auto !important; }
   ${R} > td:is([data-mbm-role=brands], [data-mbm-role=brands2]) img { max-height: 32px; width: auto !important; }
 
+  /* Oils with a price still to be confirmed: the pack line ("30ml: TBC") stands in for "£0.00". */
+  ${R}.mbm-tbc > td[data-mbm-role=ppg] { display: none; }
+  ${R}.mbm-tbc > td[data-mbm-role=packs] { display: block; grid-area: price; margin-top: 14px; font-size: 1.125rem; font-weight: 700; }
+
+  /* Discounts: pharmacy logo, medication, figures, then the discounted price strongest with the RRP beside it. */
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr:has(> td[data-mbm-role=rrp]) {
+    grid-template-areas: "thumb name name" "thumb meta meta" "price price rrp" "meta2 meta2 meta2"; padding-bottom: 14px;
+  }
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr > td[data-mbm-role=price] { justify-self: start; text-align: left !important; margin-top: 12px; }
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr > td[data-mbm-role=price]::before { content: none; }
+  ${R} > td[data-mbm-role=rrp] { grid-area: rrp; justify-self: end; align-self: end; text-align: right !important; font-size: .875rem; text-decoration: line-through; }
+  ${R} > td[data-mbm-role=meta2] { white-space: normal; }
+
   ${R} > td[data-mbm-role=thumb] { grid-area: thumb; align-self: start; }
   ${R} > td[data-mbm-role=thumb] img { width: 52px !important; height: 52px !important; object-fit: contain; border-radius: .33rem; }
   ${R} > td:is([data-mbm-role=thumb2], [data-mbm-role=altprice], [data-mbm-role=packs]) { display: none; }
@@ -479,15 +492,33 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     if (text && !/\d/.test(text) && !STOCK_WORDS.test(text)) pill.classList.add('mbm-exclusive');
   }
 
+  /** Each column's header text (spaces removed, lower case), expanded across colspans. */
+  function headerLabels(table) {
+    const labels = [];
+    if (!table || !table.tHead) return labels;
+    table.tHead.querySelectorAll('th').forEach((th) => {
+      const key = th.textContent.replace(/\s+/g, '').toLowerCase();
+      for (let i = 0; i < (th.colSpan || 1); i++) labels.push(key);
+    });
+    return labels;
+  }
+
   /** Strains list rows (table.product): positional cells plus the site's own price/terps classes. */
   function STRAIN_ROLES(tr) {
     const cells = [...tr.children];
     const tag = (td, role) => { if (td) td.dataset.mbmRole = role; };
     tag(cells[0], 'thumb');
     tag(cells[1], 'thumb2');
-    tag(cells[2], 'name');
-    tag(cells[3], 'meta');
-    tag(cells[4], 'genetics');
+    // Name, figures and strain info by column header: oils add a carrier-oil column, so positions differ by list.
+    const labels = headerLabels(tr.closest('table'));
+    let column = 0;
+    cells.forEach((td) => {
+      const key = labels[column] || '';
+      if (key.startsWith('medicalproduct') || key === 'product') tag(td, 'name');
+      else if (key.startsWith('thc')) tag(td, 'meta');
+      else if (key.startsWith('generalstrain')) tag(td, 'genetics');
+      column += td.colSpan || 1;
+    });
     cells.forEach((td) => {
       if (td.classList.contains('terps')) tag(td, 'terps');
       else if (td.classList.contains('priceGram')) tag(td, 'ppg');
@@ -499,6 +530,14 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     labelCannabinoids(tr.querySelector(':scope > [data-mbm-role=meta]'));
     labelActions(tr.querySelector(':scope > [data-mbm-role=actions]'));
     markExclusive(tr.querySelector(':scope > [data-mbm-role=stock]'));
+    markUnpriced(tr);
+  }
+
+  /** A price still to be confirmed comes through as "0.0p/mg £0.00/ml"; show the pack line ("30ml: TBC") instead. */
+  function markUnpriced(tr) {
+    const ppg = tr.querySelector(':scope > [data-mbm-role=ppg]');
+    const packs = tr.querySelector(':scope > [data-mbm-role=packs]');
+    if (ppg && packs && /TBC/i.test(packs.textContent) && !/[1-9]/.test(ppg.textContent)) tr.classList.add('mbm-tbc');
   }
 
   /** Pharmacy menu rows (table.pharmacy-list, no header row): the strains layout without meta, genetics or terps. */
@@ -603,9 +642,39 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     tr.appendChild(count);
   }
 
+  /** Discounts: same table class as the pharmacy menus, but its column names sit in the first body row. */
+  const DISCOUNT_HEADERS = [['pharmacy', 'thumb'], ['brand', 'thumb2'], ['medication', 'name'], ['details', 'meta'], ['rrp', 'rrp'], ['price', 'price'], ['status', 'meta2']];
+
+  function discountHeaderRow(table) {
+    const first = table.querySelector(':scope > tbody > tr');
+    if (!first) return null;
+    const text = first.textContent.replace(/\s+/g, ' ').toLowerCase();
+    return text.includes('medication') && text.includes('pharmacy') && text.includes('rrp') ? first : null;
+  }
+
+  function DISCOUNT_ROLES(tr) {
+    const header = discountHeaderRow(tr.closest('table'));
+    if (tr === header) {
+      tr.classList.add('mbm-merged');
+      return;
+    }
+    const keys = [...header.children].map((th) => th.textContent.replace(/\s+/g, '').toLowerCase());
+    [...tr.children].forEach((td, i) => {
+      const match = DISCOUNT_HEADERS.find(([prefix]) => keys[i] === prefix);
+      if (match) td.dataset.mbmRole = match[1];
+      else if (keys[i] === '' && i === 1) td.dataset.mbmRole = 'thumb2';
+    });
+    labelCannabinoids(tr.querySelector(':scope > [data-mbm-role=meta]'));
+  }
+
+  function PHARMACY_LIST_ROLES(tr) {
+    if (discountHeaderRow(tr.closest('table'))) DISCOUNT_ROLES(tr);
+    else PHARMACY_ROLES(tr);
+  }
+
   const CARD_TABLES = [
     { selector: 'table.product', roles: STRAIN_ROLES },
-    { selector: 'table.pharmacy-list', roles: PHARMACY_ROLES },
+    { selector: 'table.pharmacy-list', roles: PHARMACY_LIST_ROLES },
     { selector: 'table#clinics', roles: CLINIC_ROLES },
     { selector: 'table#pharmacies', roles: PHARMACIES_ROLES },
     { selector: 'table#producers', roles: PRODUCER_ROLES },
