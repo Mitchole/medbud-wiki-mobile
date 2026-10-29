@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MedBud Mobile (unofficial)
 // @namespace    https://github.com/Mitchole/medbud-wiki-mobile
-// @version      0.1.3
+// @version      0.1.4
 // @description  Makes medbud.wiki usable on phones. Unofficial; not affiliated with MedBud.
 // @match        https://medbud.wiki/*
 // @match        https://mitchole.github.io/medbud-wiki-mobile/*
@@ -15,7 +15,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '0.1.3';
+  const VERSION = '0.1.4';
   const VIEWPORT = 'width=device-width, initial-scale=1';
 
   // Two managers, a reinstall, or the app plus a manager must not apply everything twice.
@@ -119,6 +119,8 @@
      block; the title clears them so it starts on its own full-width line. */
   ${S} aside.product > div[style*="float:right"] { float: none !important; width: auto !important; margin: 0 0 1rem !important; }
   ${S} aside.product > h1 { clear: both; }
+  /* The Leafly cultivar box is indented 220px by the site's CSS, leaving a thin, tall column on the right. */
+  ${S} aside.product p.leafly { margin-left: 0 !important; }
   /* The planner panel was a 900px box hung 72px from the right; on a phone it opens in the flow under the Planner row. */
   ${S} header > #calculatorResults {
     grid-area: results; position: relative !important; top: auto !important; right: auto !important; left: auto !important;

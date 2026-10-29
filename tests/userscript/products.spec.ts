@@ -74,3 +74,15 @@ test('product page header stacks: gallery full width, title below the pictures, 
   expect(layout.buttonLeft).toBeLessThanOrEqual(40);
   expect(layout.galleryFloat).toBe('none');
 });
+
+test('the Leafly box and the price list use the full width', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone projects only');
+  await openMedbud(page, 'strain-detail');
+  const boxes = await page.evaluate(() => {
+    const r = (e: Element) => { const b = e.getBoundingClientRect(); return { left: Math.round(b.left), width: Math.round(b.width) }; };
+    return { leafly: r(document.querySelector('aside.product p.leafly')!), prices: r(document.querySelector('aside.product ul.miniPrice')!) };
+  });
+  expect(boxes.leafly.left).toBeLessThanOrEqual(40);
+  expect(boxes.leafly.width).toBeGreaterThanOrEqual(300);
+  expect(boxes.prices.left).toBeLessThanOrEqual(80);
+});
