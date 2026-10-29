@@ -2,9 +2,11 @@
 
 All notable changes to MedBud Mobile (unofficial). The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.2] - 2026-10-29
 
 ### Fixed
+- Typing in the search box zoomed the page out to the desktop layout: the site's live results carry a desktop viewport and a second copy of its stylesheet, which are now stripped, and the results box fits under the search bar.
+- Product pages: the picture no longer squeezes the title and buttons into a narrow right-hand column, and the "Other ... medications" lists are cards instead of tables cut off at the right.
 - The iPhone install step now matches Safari on iOS 26: open Manage Extensions from the button left of the address bar and tap the word Userscripts to get its install prompt (confirmed on a real iPhone).
 
 ## [0.1.1] - 2026-10-29
@@ -40,5 +42,6 @@ First release.
 - 44px tap targets, 14px minimum body text, readable contrast for faded text, a back-to-top button on long pages.
 - Fixes for the donate page, stats lists, the map size, guides (article first) and the home page's latest lists and video grid.
 
+[0.1.2]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.2
 [0.1.1]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.0

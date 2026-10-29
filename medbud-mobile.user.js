@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MedBud Mobile (unofficial)
 // @namespace    https://github.com/Mitchole/medbud-wiki-mobile
-// @version      0.1.1
+// @version      0.1.2
 // @description  Makes medbud.wiki usable on phones. Unofficial; not affiliated with MedBud.
 // @match        https://medbud.wiki/*
 // @match        https://mitchole.github.io/medbud-wiki-mobile/*
@@ -15,7 +15,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '0.1.1';
+  const VERSION = '0.1.2';
   const VIEWPORT = 'width=device-width, initial-scale=1';
 
   // Two managers, a reinstall, or the app plus a manager must not apply everything twice.
@@ -107,7 +107,14 @@
   ${S} header > #calculator { grid-area: planner; }
   ${S} header > #switchHolder { grid-area: switch; float: none !important; }
   ${S} header > nav { grid-area: nav; margin-top: 4px !important; }
-  ${S} header > #js-search { grid-column: 1 / -1; }
+  ${S} header > #js-search {
+    position: absolute !important; left: 0 !important; right: 0 !important; width: auto !important;
+    max-height: 70vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  /* Product pages: the picture block floats left and the button rows are padded 220px, squeezing the title
+     and buttons into a narrow right-hand column; stack them full width instead. */
+  ${S} aside.product > section[style*="float:left"] { float: none !important; }
+  ${S} aside.product > p[style*="padding-left"] { padding-left: 0 !important; }
   /* The planner panel was a 900px box hung 72px from the right; on a phone it opens in the flow under the Planner row. */
   ${S} header > #calculatorResults {
     grid-area: results; position: relative !important; top: auto !important; right: auto !important; left: auto !important;
@@ -311,10 +318,10 @@ ${S} .mbm-fold-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset
   ${R}:is(.mbm-merged, :empty, [style*="display: none"], [style*="display:none"]) { display: none !important; }
 
   /* Strains list and pharmacy menu share one layout; pharmacy rows simply have no meta line. */
-  ${S} table.mbm-cards:is(.product, .pharmacy-list) > tbody > tr {
+  ${S} table.mbm-cards:is(.product, .pharmacy-list, .mbm-related) > tbody > tr {
     grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "toggle toggle toggle";
   }
-  ${S} table.mbm-cards:is(.product, .pharmacy-list) > tbody > tr.mbm-open {
+  ${S} table.mbm-cards:is(.product, .pharmacy-list, .mbm-related) > tbody > tr.mbm-open {
     grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "gen gen gen" "terps terps terps" "actions actions actions" "toggle toggle toggle";
   }
   /* Cards without a Details toggle need their own bottom padding; with one, the toggle bar closes the card. */
@@ -563,6 +570,18 @@ ${S} .mbm-fold-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset
     markUnpriced(tr);
   }
 
+  /** "Other ... medications" lists on product pages: strains-list rows, but no header row to read columns from. */
+  function RELATED_ROLES(tr) {
+    tr.closest('table').classList.add('mbm-related');
+    STRAIN_ROLES(tr);
+    const cells = [...tr.children];
+    if (!tr.querySelector(':scope > [data-mbm-role=name]') && cells[2] && !cells[2].dataset.mbmRole) cells[2].dataset.mbmRole = 'name';
+    if (!tr.querySelector(':scope > [data-mbm-role=meta]') && cells[3] && !cells[3].dataset.mbmRole) {
+      cells[3].dataset.mbmRole = 'meta';
+      labelCannabinoids(cells[3]);
+    }
+  }
+
   /** A price still to be confirmed comes through as "0.0p/mg £0.00/ml"; show the pack line ("30ml: TBC") instead. */
   function markUnpriced(tr) {
     const ppg = tr.querySelector(':scope > [data-mbm-role=ppg]');
@@ -705,6 +724,7 @@ ${S} .mbm-fold-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset
   const CARD_TABLES = [
     { selector: 'table.product', roles: STRAIN_ROLES },
     { selector: 'table.pharmacy-list', roles: PHARMACY_LIST_ROLES },
+    { selector: 'section#description table:not(.product):not(.pharmacy-list):has(> tbody > tr[data-id])', roles: RELATED_ROLES },
     { selector: 'table#clinics', roles: CLINIC_ROLES },
     { selector: 'table#pharmacies', roles: PHARMACIES_ROLES },
     { selector: 'table#producers', roles: PRODUCER_ROLES },
@@ -886,6 +906,28 @@ ${S} .mbm-fold-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset
     header.parentNode.insertBefore(bar, header);
   }
 
+  /**
+   * Live search answers with a whole HTML page, head included, and jQuery drops it into #js-search. Its
+   * width=1440 viewport tag switches the phone back to the desktop layout (Chrome obeys it even inside <body>)
+   * and its stylesheet loads the site's CSS a second time. Strip the head parts and restore the viewport.
+   */
+  function cleanSearchResults(aside) {
+    const clean = () => {
+      const junk = aside.querySelectorAll('meta, link, title, base, style, script');
+      if (!junk.length) return;
+      const injectedViewport = aside.querySelector('meta[name=viewport]');
+      junk.forEach((node) => node.remove());
+      const meta = document.head && document.head.querySelector('meta[name=viewport]');
+      // The browser keeps the last viewport it applied, so nudge the real tag to make it re-read ours.
+      if (injectedViewport && meta) {
+        meta.content = `${VIEWPORT}, `;
+        meta.content = VIEWPORT;
+      }
+    };
+    new MutationObserver(clean).observe(aside, { childList: true, subtree: true });
+    clean();
+  }
+
   /** The six "trust" badges filled ~400px of every first screen; they move to just above the footer. */
   function moveCharter() {
     const charter = document.querySelector('aside.charter');
@@ -951,6 +993,7 @@ ${S} .mbm-fold-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset
     wrapWideTables(document);
     whenPresent('#mb-grid > .mb-controls', addFiltersToggle);
     addTopBar();
+    whenPresent('#js-search', cleanSearchResults);
     whenPresent('.menuEllipsis__drop-toggle', setupMenu);
     moveCharter();
     addBackToTop();
