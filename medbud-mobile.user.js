@@ -283,7 +283,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   ${R} > td[data-mbm-role=price]::before { content: "First year from"; }
   ${R} > td[data-mbm-role=price2]::before { content: "Each year after"; }
 
-  ${R} > td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions], [data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings], [data-mbm-role=notes], [data-mbm-role=brands], [data-mbm-role=brands2], [data-mbm-role=items]) { display: none; }
+  ${R} > td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions], [data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings], [data-mbm-role=notes], [data-mbm-role=brands], [data-mbm-role=brands2], [data-mbm-role=items], [data-mbm-role=extra]) { display: none; }
   ${O} > td[data-mbm-role=genetics] { display: block; grid-area: gen; margin-top: 14px; padding-top: 14px !important; border-top: 1px solid rgba(255, 255, 255, .08) !important; }
   ${O} > td[data-mbm-role=terps] { display: block; grid-area: terps; margin-top: 10px; }
   ${O} > td[data-mbm-role=actions] { display: flex; grid-area: actions; gap: 8px; margin-top: 10px; }
@@ -293,6 +293,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   ${O} > td[data-mbm-role=brands] { grid-area: brands; }
   ${O} > td[data-mbm-role=brands2] { grid-area: brands2; }
   ${O} > td[data-mbm-role=items] { display: flex; flex-wrap: wrap; gap: 8px; grid-area: items; margin-top: 12px; }
+  ${O} > td[data-mbm-role=extra] { display: block; grid-column: 1 / -1; margin-top: 12px; }
   ${O} > td[data-mbm-role=notes] > div + div { margin-top: 6px; }
   ${O} > td[data-mbm-role=price2] { grid-area: price2; font-weight: 700; }
   ${O} > td[data-mbm-role=pricing] { grid-area: pricing; }
@@ -300,6 +301,24 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   ${O} > td[data-mbm-role=contact] { grid-area: contact; overflow-wrap: anywhere; }
   ${O} > td[data-mbm-role=ratings] { grid-area: ratings; }
   ${R} > td[data-mbm-role=actions] br { display: none; }
+
+  /* Clarity: price per mg as strong as price per gram, labelled figures and actions, no empty ratings. */
+  ${R} > td[data-mbm-role=ppg] > span:first-child:not(:has(span)) { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  ${R} .stars-full[title="No Ratings"] { display: none !important; }
+  ${R} .availability.mbm-exclusive::before { content: "Only at "; }
+  ${R} > td[data-mbm-role=actions] { flex-wrap: wrap; }
+  ${R} > td[data-mbm-role=actions] button { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; }
+  ${R} > td[data-mbm-role=actions] .mbm-label { font-size: .875rem; }
+  ${S} table#clinics.mbm-cards > tbody > tr > td[data-mbm-role=meta] > * { margin-left: 0 !important; margin-right: 0 !important; }
+  ${S} table#clinics.mbm-cards > tbody > tr > td:is([data-mbm-role=meta], [data-mbm-role=pharmacy], [data-mbm-role=contact], [data-mbm-role=notes], [data-mbm-role=ratings], [data-mbm-role=pricing])::before {
+    display: block; margin-bottom: 4px; font-size: .8125rem; font-weight: 400; color: #a8a8a8; text-align: left;
+  }
+  ${S} table#clinics.mbm-cards > tbody > tr > td[data-mbm-role=meta]::before { content: "Pharmacy choice"; }
+  ${S} table#clinics.mbm-cards > tbody > tr > td[data-mbm-role=pharmacy]::before { content: "Default pharmacy"; }
+  ${S} table#clinics.mbm-cards > tbody > tr > td[data-mbm-role=contact]::before { content: "Contact"; }
+  ${S} table#clinics.mbm-cards > tbody > tr > td[data-mbm-role=notes]::before { content: "Notes"; }
+  ${S} table#clinics.mbm-cards > tbody > tr > td[data-mbm-role=ratings]::before { content: "CQC ratings"; }
+  ${S} table#clinics.mbm-cards > tbody > tr > td[data-mbm-role=pricing]::before { content: "Fees"; }
   ${R} > td[data-mbm-role=toggle] { display: block; grid-area: toggle; margin: 8px -14px 0; }
   ${R} > td > button.mbm-more {
     all: unset; box-sizing: border-box; width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -344,7 +363,48 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   // ---- Cards -------------------------------------------------------------
 
   /** Roles whose cells only show once a card's Details are open. A row with any of them gets a toggle. */
-  const DETAIL_ROLES = ['genetics', 'terps', 'actions', 'contact', 'pharmacy', 'pricing', 'price2', 'ratings', 'notes', 'brands', 'brands2', 'items'];
+  const DETAIL_ROLES = ['genetics', 'terps', 'actions', 'contact', 'pharmacy', 'pricing', 'price2', 'ratings', 'notes', 'brands', 'brands2', 'items', 'extra'];
+
+  /** "16% / <1%" never said which figure is which; make it "THC 16% · CBD <1%". */
+  function labelCannabinoids(td) {
+    if (!td) return;
+    const sep = [...td.querySelectorAll('span.quiet')].find((q) => q.textContent.trim() === '/');
+    if (!sep || sep.dataset.mbm) return;
+    sep.dataset.mbm = '1';
+    sep.textContent = ' · CBD ';
+    sep.parentNode.insertBefore(document.createTextNode('THC '), sep.parentNode.firstChild);
+  }
+
+  /** The planner and PDF buttons were bare icons; give each a short visible label from its title. */
+  function labelActions(td) {
+    if (!td) return;
+    td.querySelectorAll('button').forEach((button) => {
+      if (button.querySelector('.mbm-label')) return;
+      const title = button.getAttribute('title') || '';
+      let text = title;
+      if (button.classList.contains('calcStrain')) text = 'Add to planner';
+      else if (/patient information leaflet/i.test(title)) text = 'Leaflet';
+      else if (/certificate of analysis/i.test(title)) {
+        const date = title.match(/\(([^)]+)\)\s*$/);
+        text = date ? `Lab report (${date[1]})` : 'Lab report';
+      }
+      if (!text) return;
+      const label = document.createElement('span');
+      label.className = 'mbm-label';
+      label.textContent = text;
+      button.appendChild(label);
+    });
+  }
+
+  // Stock pills sometimes hold a pharmacy name (the only stockist) rather than a stock level.
+  const STOCK_WORDS = /^(available|in stock|expiring|low|medium|high|very high|out of stock|unavailable|discontinued|awaiting|limited|pre-?order|coming soon|changes)/i;
+
+  function markExclusive(td) {
+    const pill = td && td.querySelector('.availability');
+    if (!pill) return;
+    const text = pill.textContent.trim();
+    if (text && !/\d/.test(text) && !STOCK_WORDS.test(text)) pill.classList.add('mbm-exclusive');
+  }
 
   /** Strains list rows (table.product): positional cells plus the site's own price/terps classes. */
   function STRAIN_ROLES(tr) {
@@ -363,6 +423,9 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
       else if (td.querySelector('.availability')) tag(td, 'stock');
       else if (td.querySelector('button.calcStrain, button.pdfStrain')) tag(td, 'actions');
     });
+    labelCannabinoids(tr.querySelector(':scope > [data-mbm-role=meta]'));
+    labelActions(tr.querySelector(':scope > [data-mbm-role=actions]'));
+    markExclusive(tr.querySelector(':scope > [data-mbm-role=stock]'));
   }
 
   /** Pharmacy menu rows (table.pharmacy-list, no header row): the strains layout without meta, genetics or terps. */
@@ -376,6 +439,8 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     cells.forEach((td) => { if (td.classList.contains('priceGram')) tag(td, 'ppg'); });
     tag(cells[4], 'stock');
     tag(cells[5], 'actions');
+    labelActions(cells[5]);
+    markExclusive(cells[4]);
   }
 
   /** Map cells to roles by their column header text (spaces removed, lower case, matched by prefix). */
@@ -496,6 +561,13 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
       if (tr.dataset.mbm || tr.children.length < 2) return;
       tr.dataset.mbm = '1';
       roles(tr);
+      if (tr.classList.contains('mbm-merged')) return;
+      // Cells a role map does not know (a column the site added later, an extra column on one list)
+      // go behind Details instead of leaking below the card.
+      const cells = [...tr.children];
+      if (cells.some((td) => td.dataset.mbmRole)) {
+        cells.forEach((td) => { if (!td.dataset.mbmRole) td.dataset.mbmRole = 'extra'; });
+      }
       const hasDetails = [...tr.children].some((td) => DETAIL_ROLES.includes(td.dataset.mbmRole) && td.textContent.trim() + td.innerHTML.trim());
       if (hasDetails) addToggle(tr);
     });
