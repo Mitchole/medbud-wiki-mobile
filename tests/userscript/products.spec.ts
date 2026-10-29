@@ -55,3 +55,22 @@ test.describe('discounts', () => {
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
   });
 });
+
+test('product page header stacks: gallery full width, title below the pictures, buttons from the left', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone projects only');
+  await openMedbud(page, 'strain-detail');
+  const layout = await page.evaluate(() => {
+    const aside = document.querySelector('aside.product')!;
+    const h1 = aside.querySelector('h1')!.getBoundingClientRect();
+    const figuresBottom = Math.max(...[...aside.querySelectorAll('section figure')].map((f) => f.getBoundingClientRect().bottom));
+    const gallery = aside.querySelector('div[style*="float:right"]');
+    return {
+      titleBelowPictures: h1.top >= figuresBottom - 1,
+      buttonLeft: Math.round(aside.querySelector('button.calcStrain')!.getBoundingClientRect().left),
+      galleryFloat: gallery ? getComputedStyle(gallery).float : 'none',
+    };
+  });
+  expect(layout.titleBelowPictures).toBe(true);
+  expect(layout.buttonLeft).toBeLessThanOrEqual(40);
+  expect(layout.galleryFloat).toBe('none');
+});

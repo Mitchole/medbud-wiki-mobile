@@ -2,6 +2,11 @@
 
 All notable changes to MedBud Mobile (unofficial). The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.1.3] - 2026-10-29
+
+### Fixed
+- Flower and other product pages: the gallery and the leaflet/certificate boxes no longer push the title and buttons into a narrow column; the title starts on its own line and the buttons run from the left.
+
 ## [0.1.2] - 2026-10-29
 
 ### Fixed
@@ -42,6 +47,7 @@ First release.
 - 44px tap targets, 14px minimum body text, readable contrast for faded text, a back-to-top button on long pages.
 - Fixes for the donate page, stats lists, the map size, guides (article first) and the home page's latest lists and video grid.
 
+[0.1.3]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.3
 [0.1.2]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.2
 [0.1.1]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.0

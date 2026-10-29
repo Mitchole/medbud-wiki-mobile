@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MedBud Mobile (unofficial)
 // @namespace    https://github.com/Mitchole/medbud-wiki-mobile
-// @version      0.1.2
+// @version      0.1.3
 // @description  Makes medbud.wiki usable on phones. Unofficial; not affiliated with MedBud.
 // @match        https://medbud.wiki/*
 // @match        https://mitchole.github.io/medbud-wiki-mobile/*
@@ -15,7 +15,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '0.1.2';
+  const VERSION = '0.1.3';
   const VIEWPORT = 'width=device-width, initial-scale=1';
 
   // Two managers, a reinstall, or the app plus a manager must not apply everything twice.
@@ -114,7 +114,11 @@
   /* Product pages: the picture block floats left and the button rows are padded 220px, squeezing the title
      and buttons into a narrow right-hand column; stack them full width instead. */
   ${S} aside.product > section[style*="float:left"] { float: none !important; }
-  ${S} aside.product > p[style*="padding-left"] { padding-left: 0 !important; }
+  ${S} aside.product p[style*="padding-left"] { padding-left: 0 !important; }
+  /* Flower pages add a 220px gallery floated right, and the leaflet/certificate boxes float left inside the picture
+     block; the title clears them so it starts on its own full-width line. */
+  ${S} aside.product > div[style*="float:right"] { float: none !important; width: auto !important; margin: 0 0 1rem !important; }
+  ${S} aside.product > h1 { clear: both; }
   /* The planner panel was a 900px box hung 72px from the right; on a phone it opens in the flow under the Planner row. */
   ${S} header > #calculatorResults {
     grid-area: results; position: relative !important; top: auto !important; right: auto !important; left: auto !important;
