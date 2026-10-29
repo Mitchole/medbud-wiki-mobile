@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MedBud Mobile (unofficial): install</title>
+<meta name="description" content="Make medbud.wiki fit your phone. A free, unofficial add-on, installed one step at a time.">
+<style>
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .js .path-name { display: none; }
+  .js .step[hidden], [hidden] { display: none !important; }
+  html:not(.js) .bar, html:not(.js) .meter, html:not(.js) #installed { display: none; }
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="name">MedBud Mobile <i>unofficial</i></p>
+  <a class="other" href="#chooser">Not your device?</a>
+</header>
+<div class="meter" id="meter" aria-hidden="true"></div>
+<p id="announce" class="sr" aria-live="polite"></p>
+<main>
+<section class="step" id="chooser" data-path="chooser" aria-labelledby="chooser-t">
+  <article class="label">
+    <div class="head"><span>Start here</span></div>
+    <h2 id="chooser-t" tabindex="-1">Which device are you on?</h2>
+    <div class="dir">
+      <ul class="choices">
+        <li><a class="choice" href="#ios-1">iPhone or iPad</a></li>
+        <li><a class="choice" href="#firefox-1">Android, with Firefox</a></li>
+        <li><a class="choice" href="#android-1">Android, with Chrome or another browser</a></li>
+        <li><a class="choice" href="#desktop-1">A computer</a></li>
+      </ul>
+    </div>
+  </article>
+</section>
+<div class="path" data-path="ios">
+<h1 class="path-name">On an iPhone or iPad</h1>
+<section class="step" id="ios-1" data-path="ios" data-step="1" data-total="4" aria-labelledby="ios-1-t">
+  <article class="label">
+    <div class="head"><span>Step 1 of 4</span><span>About 1 min</span></div>
+    <h2 id="ios-1-t" tabindex="-1">Get the Userscripts app</h2>
+    <div class="row"><span class="k">For</span><span class="v">iPhone or iPad, using Safari</span></div>
+    <div class="dir"><ol><li>Tap <b>Open the App Store</b> below.</li><li>Tap <b>Get</b>. The Userscripts app is free.</li><li>Come back to this page.</li></ol>
+      <p class="act"><a class="act-btn" href="https://apps.apple.com/app/userscripts/id1463298887">Open the App Store</a></p>
+    </div>
+    <p class="caution"><span>Important</span>Needs iOS 15.1 or later. It&rsquo;s free.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Turn on Userscripts in Safari</span></div>
+  </article>
+</section>
+<section class="step" id="ios-2" data-path="ios" data-step="2" data-total="4" aria-labelledby="ios-2-t">
+  <article class="label">
+    <div class="head"><span>Step 2 of 4</span><span>About 1 min</span></div>
+    <h2 id="ios-2-t" tabindex="-1">Turn on Userscripts in Safari</h2>
+    <div class="row"><span class="k">For</span><span class="v">iPhone or iPad, using Safari</span></div>
+    <div class="dir"><ol><li>Open the <b>Settings</b> app.</li><li>Go to <b>Apps&nbsp;&rsaquo; Safari&nbsp;&rsaquo; Extensions</b>.</li><li>Tap <b>Userscripts</b> and switch it on.</li></ol>
+    </div>
+    <p class="caution"><span>Important</span>Set All Websites to Allow, or it won&rsquo;t run on MedBud.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Install MedBud Mobile</span></div>
+  </article>
+</section>
+<section class="step" id="ios-3" data-path="ios" data-step="3" data-total="4" aria-labelledby="ios-3-t">
+  <article class="label">
+    <div class="head"><span>Step 3 of 4</span><span>About 1 min</span></div>
+    <h2 id="ios-3-t" tabindex="-1">Install MedBud Mobile</h2>
+    <div class="row"><span class="k">For</span><span class="v">iPhone or iPad, using Safari</span></div>
+    <div class="dir"><ol><li>Tap <b>Open the script</b> below.</li><li>Tap the <b>puzzle-piece</b> (or <b>AA</b>) icon in the address bar.</li><li>Tap <b>Userscripts</b>, then <b>Install</b>.</li></ol>
+      <p class="act"><a class="act-btn" href="https://mitchole.github.io/medbud-wiki-mobile/medbud-mobile.user.js">Open the script</a></p>
+    </div>
+    <p class="caution"><span>Important</span>Open it in Safari, not another browser.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Check it worked</span></div>
+  </article>
+</section>
+<section class="step" id="ios-4" data-path="ios" data-step="4" data-total="4" aria-labelledby="ios-4-t" data-check>
+  <article class="label">
+    <div class="head"><span>Step 4 of 4</span><span>Seconds</span></div>
+    <h2 id="ios-4-t" tabindex="-1">Check it worked</h2>
+    <div class="row"><span class="k">For</span><span class="v">iPhone or iPad, using Safari</span></div>
+    <div class="dir"><ol><li>Tap <b>Check now</b>.</li><li>When it says installed, open MedBud.</li></ol>
+      <p class="notfound" role="status" hidden>MedBud Mobile was not found yet. Check the step above, then tap Check now again.</p>
+    </div>
+    <p class="caution"><span>Important</span>If it isn&rsquo;t found, open the Userscripts menu and switch MedBud Mobile on.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Use MedBud as normal</span></div>
+  </article>
+</section>
+</div>
+<div class="path" data-path="firefox">
+<h1 class="path-name">On Android, with Firefox</h1>
+<section class="step" id="firefox-1" data-path="firefox" data-step="1" data-total="3" aria-labelledby="firefox-1-t">
+  <article class="label">
+    <div class="head"><span>Step 1 of 3</span><span>About 1 min</span></div>
+    <h2 id="firefox-1-t" tabindex="-1">Add Tampermonkey to Firefox</h2>
+    <div class="row"><span class="k">For</span><span class="v">Android, using Firefox</span></div>
+    <div class="dir"><ol><li>Tap <b>Open Firefox Add-ons</b> below.</li><li>Tap <b>Add to Firefox</b>.</li><li>Tap <b>Add</b> when Firefox asks.</li></ol>
+      <p class="act"><a class="act-btn" href="https://addons.mozilla.org/android/addon/tampermonkey/">Open Firefox Add-ons</a></p>
+    </div>
+    <p class="caution"><span>Important</span>Tap Add when Firefox asks for permissions: it needs them to fix the pages.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Install MedBud Mobile</span></div>
+  </article>
+</section>
+<section class="step" id="firefox-2" data-path="firefox" data-step="2" data-total="3" aria-labelledby="firefox-2-t">
+  <article class="label">
+    <div class="head"><span>Step 2 of 3</span><span>About 1 min</span></div>
+    <h2 id="firefox-2-t" tabindex="-1">Install MedBud Mobile</h2>
+    <div class="row"><span class="k">For</span><span class="v">Android, using Firefox</span></div>
+    <div class="dir"><ol><li>Tap <b>Open the script</b> below.</li><li>Tampermonkey shows its install screen.</li><li>Tap <b>Install</b>.</li></ol>
+      <p class="act"><a class="act-btn" href="https://mitchole.github.io/medbud-wiki-mobile/medbud-mobile.user.js">Open the script</a></p>
+    </div>
+    <p class="caution"><span>Important</span>If you only see code, Tampermonkey isn&rsquo;t on yet: go back a step.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Check it worked</span></div>
+  </article>
+</section>
+<section class="step" id="firefox-3" data-path="firefox" data-step="3" data-total="3" aria-labelledby="firefox-3-t" data-check>
+  <article class="label">
+    <div class="head"><span>Step 3 of 3</span><span>Seconds</span></div>
+    <h2 id="firefox-3-t" tabindex="-1">Check it worked</h2>
+    <div class="row"><span class="k">For</span><span class="v">Android, using Firefox</span></div>
+    <div class="dir"><ol><li>Tap <b>Check now</b>.</li><li>When it says installed, open MedBud.</li></ol>
+      <p class="notfound" role="status" hidden>MedBud Mobile was not found yet. Check the step above, then tap Check now again.</p>
+    </div>
+    <p class="caution"><span>Important</span>If it isn&rsquo;t found, open the Tampermonkey menu and switch MedBud Mobile on.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Use MedBud as normal</span></div>
+  </article>
+</section>
+</div>
+<div class="path" data-path="android">
+<h1 class="path-name">On Android, with Chrome or another browser</h1>
+<section class="step" id="android-1" data-path="android" data-step="1" data-total="2" aria-labelledby="android-1-t">
+  <article class="label">
+    <div class="head"><span>Step 1 of 2</span><span>About 2 min</span></div>
+    <h2 id="android-1-t" tabindex="-1">Get Firefox</h2>
+    <div class="row"><span class="k">For</span><span class="v">Android, using Chrome or another browser</span></div>
+    <div class="dir"><ol><li>Tap <b>Get Firefox on Google Play</b> below.</li><li>Tap <b>Install</b>.</li><li>Come back to this page.</li></ol>
+      <p class="act"><a class="act-btn" href="https://play.google.com/store/apps/details?id=org.mozilla.firefox">Get Firefox on Google Play</a></p>
+    </div>
+    <p class="caution"><span>Important</span>Chrome on Android can&rsquo;t run add-ons. Keep using Chrome for everything else.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Open this guide in Firefox</span></div>
+  </article>
+</section>
+<section class="step" id="android-2" data-path="android" data-step="2" data-total="2" aria-labelledby="android-2-t">
+  <article class="label">
+    <div class="head"><span>Step 2 of 2</span><span>About 1 min</span></div>
+    <h2 id="android-2-t" tabindex="-1">Open this guide in Firefox</h2>
+    <div class="row"><span class="k">For</span><span class="v">Android, using Chrome or another browser</span></div>
+    <div class="dir"><ol><li>Tap <b>Copy link</b> below.</li><li>Open <b>Firefox</b>.</li><li>Paste the link into the address bar and go.</li></ol>
+      <p class="act"><button type="button" class="act-btn" data-copy="https://mitchole.github.io/medbud-wiki-mobile/">Copy link</button></p>
+      <p class="link-text">https://mitchole.github.io/medbud-wiki-mobile/</p>
+    </div>
+    <p class="caution"><span>Important</span>Paste it into Firefox&rsquo;s address bar.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Carry on in Firefox</span></div>
+  </article>
+</section>
+</div>
+<div class="path" data-path="desktop">
+<h1 class="path-name">On a computer</h1>
+<section class="step" id="desktop-1" data-path="desktop" data-step="1" data-total="3" aria-labelledby="desktop-1-t" data-next-label="Try it on this computer anyway">
+  <article class="label">
+    <div class="head"><span>Step 1 of 3</span></div>
+    <h2 id="desktop-1-t" tabindex="-1">This is for phones</h2>
+    <div class="row"><span class="k">For</span><span class="v">A computer</span></div>
+    <div class="dir"><ol><li>Open this page on your phone to install it there.</li><li>MedBud already fits a computer screen.</li></ol>
+    </div>
+    <p class="caution"><span>Important</span>MedBud&rsquo;s own layout already fits a computer screen, so nothing will change here.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Add Tampermonkey</span></div>
+  </article>
+</section>
+<section class="step" id="desktop-2" data-path="desktop" data-step="2" data-total="3" aria-labelledby="desktop-2-t">
+  <article class="label">
+    <div class="head"><span>Step 2 of 3</span><span>About 1 min</span></div>
+    <h2 id="desktop-2-t" tabindex="-1">Add Tampermonkey</h2>
+    <div class="row"><span class="k">For</span><span class="v">A computer</span></div>
+    <div class="dir"><ol><li>Tap <b>Get Tampermonkey</b> below.</li><li>Add it to your browser.</li><li>Come back to this page.</li></ol>
+      <p class="act"><a class="act-btn" href="https://www.tampermonkey.net/">Get Tampermonkey</a></p>
+    </div>
+    <div class="row"><span class="k">Next</span><span class="v">Install MedBud Mobile</span></div>
+  </article>
+</section>
+<section class="step" id="desktop-3" data-path="desktop" data-step="3" data-total="3" aria-labelledby="desktop-3-t">
+  <article class="label">
+    <div class="head"><span>Step 3 of 3</span><span>About 1 min</span></div>
+    <h2 id="desktop-3-t" tabindex="-1">Install MedBud Mobile</h2>
+    <div class="row"><span class="k">For</span><span class="v">A computer</span></div>
+    <div class="dir"><ol><li>Click <b>Open the script</b> below.</li><li>Tampermonkey shows its install screen.</li><li>Click <b>Install</b>.</li></ol>
+      <p class="act"><a class="act-btn" href="https://mitchole.github.io/medbud-wiki-mobile/medbud-mobile.user.js">Open the script</a></p>
+    </div>
+    <p class="caution"><span>Important</span>It only changes MedBud on phone-sized screens.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Open MedBud on a phone-sized window</span></div>
+  </article>
+</section>
+</div>
+<section class="step" id="installed" data-path="installed" aria-labelledby="installed-t" hidden>
+  <article class="label">
+    <div class="head"><span>Installed</span></div>
+    <h2 id="installed-t" tabindex="-1">MedBud Mobile is installed</h2>
+    <div class="row"><span class="k">Version</span><span class="v" id="installed-version"></span></div>
+    <div class="dir">
+      <p>MedBud now fits your phone. Updates arrive by themselves: Tampermonkey checks every day; in the Userscripts app, open its menu and check for updates now and then.</p>
+      <p class="act"><a class="act-btn" href="https://medbud.wiki/">Open MedBud</a></p>
+      <p class="report">Not every MedBud page has been checked yet. If a page looks wrong on your phone, please <a href="https://github.com/Mitchole/medbud-wiki-mobile/issues/new">report it on GitHub</a> with the page&rsquo;s address.</p>
+    </div>
+  </article>
+</section>
+</main>
+<footer class="caveat">
+  <p>Unofficial and not made by MedBud. Not every MedBud page has been checked on a phone yet: if one looks wrong, <a href="https://github.com/Mitchole/medbud-wiki-mobile/issues/new">report it on GitHub</a>.</p>
+</footer>
+<nav class="bar" aria-label="Steps">
+  <button type="button" id="back" class="btn prev">Back</button>
+  <button type="button" id="next" class="btn next">Done, next step</button>
+</nav>
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  root.classList.add('js');
+
+  /** Which install path suits this browser: ios, firefox, android, desktop or unknown. */
+  function detect(ua, touchPoints) {
+    if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1)) return 'ios';
+    if (/Android/.test(ua)) return /Firefox\//.test(ua) ? 'firefox' : 'android';
+    if (/Windows NT|Macintosh|X11|CrOS/.test(ua)) return 'desktop';
+    return 'unknown';
+  }
+
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+  var byId = {};
+  steps.forEach(function (s) { byId[s.id] = s; });
+  var back = document.getElementById('back');
+  var next = document.getElementById('next');
+  var meter = document.getElementById('meter');
+  var announce = document.getElementById('announce');
+  var current = null;
+  var previous = null;
+
+  function installedVersion() { return root.dataset.medbudMobile || ''; }
+
+  function show(id, quiet) {
+    var step = byId[id] || byId.chooser;
+    if (current && current !== step && step.id === 'chooser') previous = current.id;
+    steps.forEach(function (s) { s.classList.toggle('current', s === step); s.hidden = s !== step; });
+    current = step;
+    var n = Number(step.dataset.step || 0);
+    var total = Number(step.dataset.total || 0);
+    meter.innerHTML = '';
+    for (var i = 1; i <= total; i++) {
+      var seg = document.createElement('span');
+      if (i <= n) seg.className = 'on';
+      meter.appendChild(seg);
+    }
+    meter.hidden = !total;
+    var isPath = total > 0;
+    var last = isPath && n === total;
+    if (step.id === 'installed') {
+      document.getElementById('installed-version').textContent = installedVersion();
+    }
+    back.disabled = step.id === 'installed' || (isPath ? n === 1 : !previous);
+    next.hidden = !isPath || (last && step.dataset.path === 'desktop');
+    next.textContent = step.hasAttribute('data-check') ? 'Check now' : (step.dataset.nextLabel || 'Done, next step');
+    document.body.dataset.at = step.id;
+    var title = step.querySelector('h2').textContent;
+    if (!quiet) announce.textContent = isPath ? 'Step ' + n + ' of ' + total + ': ' + title : title;
+  }
+
+  function go(id) {
+    if (location.hash === '#' + id) show(id);
+    else location.hash = id;
+  }
+
+  function route(quiet) {
+    var id = location.hash.slice(1);
+    if (installedVersion() && id !== 'chooser') { show('installed', quiet); return; }
+    if (!byId[id] || id === 'installed') {
+      var path = detect(navigator.userAgent, navigator.maxTouchPoints || 0);
+      id = path === 'unknown' ? 'chooser' : path + '-1';
+      history.replaceState(null, '', '#' + id);
+    }
+    show(id, quiet);
+  }
+
+  next.addEventListener('click', function () {
+    if (!current) return;
+    if (current.hasAttribute('data-check')) {
+      if (installedVersion()) { go('installed'); return; }
+      try { sessionStorage.setItem('mbm-check', '1'); } catch (e) { /* storage blocked: the reload still checks */ }
+      location.reload();
+      return;
+    }
+    var n = Number(current.dataset.step);
+    var following = current.dataset.path + '-' + (n + 1);
+    if (byId[following]) go(following);
+    else if (current.dataset.path === 'android') go('firefox-1');
+  });
+
+  back.addEventListener('click', function () {
+    if (!current) return;
+    if (current.id === 'chooser') { if (previous) go(previous); return; }
+    var n = Number(current.dataset.step);
+    if (n > 1) go(current.dataset.path + '-' + (n - 1));
+  });
+
+  document.addEventListener('click', function (event) {
+    var copy = event.target.closest && event.target.closest('[data-copy]');
+    if (!copy) return;
+    var url = copy.getAttribute('data-copy');
+    function done(ok) { copy.textContent = ok ? 'Link copied' : 'Press and hold the link below to copy it'; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function () { done(true); }, function () { done(false); });
+    } else {
+      done(false);
+    }
+  });
+
+  window.addEventListener('hashchange', function () { route(false); });
+  route(true);
+
+  var checked = false;
+  try { checked = sessionStorage.getItem('mbm-check') === '1'; sessionStorage.removeItem('mbm-check'); } catch (e) { /* ignore */ }
+  if (checked && current && current.hasAttribute('data-check')) {
+    current.querySelector('.notfound').hidden = false;
+  }
+})();
+</script>
+</body>
+</html>
