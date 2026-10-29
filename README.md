@@ -2,6 +2,8 @@
 
 Makes [medbud.wiki](https://medbud.wiki) usable on a phone. Not affiliated with or endorsed by MedBud.
 
+[![Before and after on a phone: tables become cards, pages fit the screen (30-second video)](medbud-mobile-promo.jpg)](medbud-mobile-promo.mp4)
+
 medbud.wiki is built for 1440px desktop screens, so on a phone it shows a shrunk page with tiny text and links. This userscript runs in your own browser and, on phone-sized screens only:
 
 - lays the page out at your phone's width;
