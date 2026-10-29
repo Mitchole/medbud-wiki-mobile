@@ -150,6 +150,19 @@
   .next:hover { background: #e9f3ec; border-color: #e9f3ec; }
   .bar:has(> .next[hidden]) .prev { grid-column: 1 / -1; }
 
+  body[data-at="chooser"] .other { visibility: hidden; }
+  @media (max-width: 360px) {
+    .top { flex-wrap: nowrap; align-items: flex-start; }
+    .name { font-size: 1rem; line-height: 1.25; padding-top: 4px; }
+    .name i { display: block; margin: 0; font-size: .8125rem; }
+    .other { font-size: .875rem; }
+    .row { grid-template-columns: 4.75rem minmax(0, 1fr); }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .bar { position: static; max-width: var(--column); margin: 0 auto; padding: 20px var(--gutter) 0; background: none; }
+    .caveat { padding-bottom: 40px; }
+  }
+
   /* The signature swap: Done slides the label off to the left and sets the next one down in the same box. */
   .step.current .label { view-transition-name: label; }
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
@@ -178,7 +191,6 @@
 <main>
 <section class="step" id="chooser" data-path="chooser" aria-labelledby="chooser-t">
   <article class="label">
-    <div class="head"><span>Start here</span></div>
     <h2 id="chooser-t" tabindex="-1">Which device are you on?</h2>
     <div class="dir">
       <ul class="choices">
@@ -209,7 +221,7 @@
     <div class="head"><span>Step 2 of 4</span><span>About 1 min</span></div>
     <h2 id="ios-2-t" tabindex="-1">Turn on Userscripts in Safari</h2>
     <div class="row"><span class="k">For</span><span class="v">iPhone or iPad, using Safari</span></div>
-    <div class="dir"><ol><li>Open the <b>Settings</b> app.</li><li>Go to <b>Apps&nbsp;&rsaquo; Safari&nbsp;&rsaquo; Extensions</b>.</li><li>Tap <b>Userscripts</b> and switch it on.</li></ol>
+    <div class="dir"><ol><li>Open the <b>Settings</b> app.</li><li>Go to <b>Apps&nbsp;&rsaquo; Safari&nbsp;&rsaquo; Extensions</b> (on iOS 17 or older: <b>Safari&nbsp;&rsaquo; Extensions</b>).</li><li>Tap <b>Userscripts</b> and switch it on.</li></ol>
     </div>
     <p class="caution"><span>Important</span>Set All Websites to Allow, or it won&rsquo;t run on MedBud.</p>
     <div class="row"><span class="k">Next</span><span class="v">Install MedBud Mobile</span></div>
@@ -309,14 +321,14 @@
 </div>
 <div class="path" data-path="desktop">
 <h1 class="path-name">On a computer</h1>
-<section class="step" id="desktop-1" data-path="desktop" data-step="1" data-total="3" aria-labelledby="desktop-1-t" data-next-label="Try it on this computer anyway">
+<section class="step" id="desktop-1" data-path="desktop" data-step="1" data-total="3" aria-labelledby="desktop-1-t" data-next-label="Install it here anyway (for testing)">
   <article class="label">
     <div class="head"><span>Step 1 of 3</span></div>
     <h2 id="desktop-1-t" tabindex="-1">This is for phones</h2>
     <div class="row"><span class="k">For</span><span class="v">A computer</span></div>
-    <div class="dir"><ol><li>Open this page on your phone to install it there.</li><li>MedBud already fits a computer screen.</li></ol>
+    <div class="dir"><ol><li>Open this page on your phone.</li><li>Follow the steps there.</li></ol>
     </div>
-    <p class="caution"><span>Important</span>MedBud&rsquo;s own layout already fits a computer screen, so nothing will change here.</p>
+    <p class="caution"><span>Important</span>MedBud Mobile does nothing on a computer: it only runs on phone-sized screens.</p>
     <div class="row"><span class="k">Next</span><span class="v">Add Tampermonkey</span></div>
   </article>
 </section>
@@ -325,7 +337,7 @@
     <div class="head"><span>Step 2 of 3</span><span>About 1 min</span></div>
     <h2 id="desktop-2-t" tabindex="-1">Add Tampermonkey</h2>
     <div class="row"><span class="k">For</span><span class="v">A computer</span></div>
-    <div class="dir"><ol><li>Tap <b>Get Tampermonkey</b> below.</li><li>Add it to your browser.</li><li>Come back to this page.</li></ol>
+    <div class="dir"><ol><li>Click <b>Get Tampermonkey</b> below.</li><li>Add it to your browser.</li><li>Come back to this page.</li></ol>
       <p class="act"><a class="act-btn" href="https://www.tampermonkey.net/">Get Tampermonkey</a></p>
     </div>
     <div class="row"><span class="k">Next</span><span class="v">Install MedBud Mobile</span></div>
@@ -339,16 +351,16 @@
     <div class="dir"><ol><li>Click <b>Open the script</b> below.</li><li>Tampermonkey shows its install screen.</li><li>Click <b>Install</b>.</li></ol>
       <p class="act"><a class="act-btn" href="https://mitchole.github.io/medbud-wiki-mobile/medbud-mobile.user.js">Open the script</a></p>
     </div>
-    <p class="caution"><span>Important</span>It only changes MedBud on phone-sized screens.</p>
-    <div class="row"><span class="k">Next</span><span class="v">Open MedBud on a phone-sized window</span></div>
+    <p class="caution"><span>Important</span>It only runs on phone-sized screens, such as your browser&rsquo;s phone view in its developer tools.</p>
+    <div class="row"><span class="k">Next</span><span class="v">Open this page on your phone</span></div>
   </article>
 </section>
 </div>
 <section class="step" id="installed" data-path="installed" aria-labelledby="installed-t" hidden>
   <article class="label">
-    <div class="head"><span>Installed</span></div>
     <h2 id="installed-t" tabindex="-1">MedBud Mobile is installed</h2>
     <div class="row"><span class="k">Version</span><span class="v" id="installed-version"></span></div>
+    <div class="row"><span class="k">Checked</span><span class="v" id="installed-date"></span></div>
     <div class="dir">
       <p>MedBud now fits your phone. Updates arrive by themselves: Tampermonkey checks every day; in the Userscripts app, open its menu and check for updates now and then.</p>
       <p class="act"><a class="act-btn" href="https://medbud.wiki/">Open MedBud</a></p>
@@ -357,13 +369,13 @@
   </article>
 </section>
 </main>
-<footer class="caveat">
-  <p>Unofficial and not made by MedBud. Not every MedBud page has been checked on a phone yet: if one looks wrong, <a href="https://github.com/Mitchole/medbud-wiki-mobile/issues/new">report it on GitHub</a>.</p>
-</footer>
 <nav class="bar" aria-label="Steps">
   <button type="button" id="back" class="btn prev">Back</button>
   <button type="button" id="next" class="btn next">Done, next step</button>
 </nav>
+<footer class="caveat">
+  <p>Unofficial and not made by MedBud. Not every MedBud page has been checked on a phone yet: if one looks wrong, <a href="https://github.com/Mitchole/medbud-wiki-mobile/issues/new">report it on GitHub</a>.</p>
+</footer>
 <script>
 (function () {
   'use strict';
@@ -380,7 +392,9 @@
 
   var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
   var byId = {};
-  steps.forEach(function (s) { byId[s.id] = s; });
+  // Step ids double as hash targets for the no-JS page. With JS, a matching id would make the browser jump to the
+  // step (past the header) on load; keep the key in data-key instead.
+  steps.forEach(function (s) { s.dataset.key = s.id; byId[s.id] = s; s.removeAttribute('id'); });
   var back = document.getElementById('back');
   var next = document.getElementById('next');
   var meter = document.getElementById('meter');
@@ -392,7 +406,7 @@
 
   function show(id, quiet) {
     var step = byId[id] || byId.chooser;
-    if (current && current !== step && step.id === 'chooser') previous = current.id;
+    if (current && current !== step && step.dataset.key === 'chooser') previous = current.dataset.key;
     steps.forEach(function (s) { s.classList.toggle('current', s === step); s.hidden = s !== step; });
     current = step;
     var n = Number(step.dataset.step || 0);
@@ -406,35 +420,43 @@
     meter.hidden = !total;
     var isPath = total > 0;
     var last = isPath && n === total;
-    if (step.id === 'installed') {
+    if (step.dataset.key === 'installed') {
       document.getElementById('installed-version').textContent = installedVersion();
+      document.getElementById('installed-date').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     }
-    back.disabled = step.id === 'installed' || (isPath ? n === 1 : !previous);
-    next.hidden = !isPath || (last && step.dataset.path === 'desktop');
+    back.disabled = step.dataset.key === 'installed' || (isPath ? n === 1 : !previous);
+    next.hidden = !isPath || (last && (step.dataset.path === 'desktop' || step.dataset.path === 'android'));
     next.textContent = step.hasAttribute('data-check') ? 'Check now' : (step.dataset.nextLabel || 'Done, next step');
     // A bar holding only a disabled Back says nothing: drop it (chooser on arrival, installed).
     document.querySelector('.bar').hidden = back.disabled && next.hidden;
-    document.body.dataset.at = step.id;
+    document.body.dataset.at = step.dataset.key;
     var title = step.querySelector('h2').textContent;
     if (!quiet) announce.textContent = isPath ? 'Step ' + n + ' of ' + total + ': ' + title : title;
   }
 
   /** Change step with the label swap: slide off left and set down (Back reverses); instant with reduced motion. */
+  var wanted = null;
   function swapTo(id) {
     var from = current;
     var to = byId[id] || byId.chooser;
     var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var change = function () { show(id); window.scrollTo(0, 0); };
-    if (!document.startViewTransition || still || !from || from === to) { change(); return; }
+    // Quick taps can start a swap while the last one is still pending; every swap shows the latest request,
+    // so a superseded transition's late update can never put an older step back.
+    wanted = id;
+    var change = function () { show(wanted); window.scrollTo(0, 0); };
+    // The chooser is a fork, not a label on a path, so it swaps instantly (a view transition leaving it also
+    // froze WebKit in testing).
+    var fork = from && (from.dataset.key === 'chooser' || to.dataset.key === 'chooser');
+    if (!document.startViewTransition || still || !from || from === to || fork) { change(); return; }
     var backwards = from.dataset.path === to.dataset.path && Number(to.dataset.step) < Number(from.dataset.step);
-    root.classList.toggle('going-back', backwards || to.id === previous);
+    root.classList.toggle('going-back', backwards || to.dataset.key === previous);
     var transition = document.startViewTransition(change);
     transition.finished.then(function () { root.classList.remove('going-back'); }, function () { root.classList.remove('going-back'); });
   }
 
   function go(id) {
-    if (location.hash === '#' + id) show(id);
-    else location.hash = id;
+    if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+    route(false);
   }
 
   function route(quiet) {
@@ -465,7 +487,7 @@
 
   back.addEventListener('click', function () {
     if (!current) return;
-    if (current.id === 'chooser') { if (previous) go(previous); return; }
+    if (current.dataset.key === 'chooser') { if (previous) go(previous); return; }
     var n = Number(current.dataset.step);
     if (n > 1) go(current.dataset.path + '-' + (n - 1));
   });

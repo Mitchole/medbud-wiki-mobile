@@ -10,7 +10,7 @@ async function phone(browser: import('@playwright/test').Browser, info: import('
 
 async function at(page: Page, id: string) {
   await page.evaluate((h) => { location.hash = h; }, id);
-  await expect(page.locator('.step:visible')).toHaveAttribute('id', id);
+  await expect(page.locator('.step:visible')).toHaveAttribute('data-key', id);
 }
 
 test.describe('install guide look', () => {
@@ -123,9 +123,28 @@ test.describe('install guide look', () => {
     // Read in the same task as the hash change: an animated swap would still be running (or not yet applied).
     const state = await page.evaluate(() => {
       const shown = [...document.querySelectorAll('.step')].filter((s) => getComputedStyle(s).display !== 'none');
-      return { shown: shown.length, id: shown[0].id, running: document.getAnimations().filter((a) => a.playState === 'running').length };
+      return { shown: shown.length, id: (shown[0] as HTMLElement).dataset.key, running: document.getAnimations().filter((a) => a.playState === 'running').length };
     });
     expect(state).toEqual({ shown: 1, id: 'ios-2', running: 0 });
     await page.context().close();
   });
+});
+
+test('at 320px the top bar stays on one line', async ({ browser }, info) => {
+  test.skip(!info.project.use.isMobile || info.project.name === 'iphone-landscape', 'portrait phones');
+  const page = await guidePage(browser, info, UA.iphone, { viewport: { width: 320, height: 640 } });
+  await openGuide(page, { hash: 'ios-3' });
+  const tops = await page.evaluate(() => [...document.querySelectorAll('.top > *')].map((e) => Math.round(e.getBoundingClientRect().top)));
+  expect(new Set(tops).size).toBe(1);
+  await page.context().close();
+});
+
+test('on a desktop the buttons sit under the label, not pinned to the bottom', async ({ browser }, info) => {
+  test.skip(info.project.name !== 'desktop', 'desktop only');
+  const page = await guidePage(browser, info, UA.desktopChrome);
+  await openGuide(page);
+  const gap = await page.evaluate(() => document.querySelector('.bar')!.getBoundingClientRect().top - document.querySelector('.step:not([hidden]) .label')!.getBoundingClientRect().bottom);
+  expect(gap).toBeGreaterThanOrEqual(0);
+  expect(gap).toBeLessThanOrEqual(48);
+  await page.context().close();
 });

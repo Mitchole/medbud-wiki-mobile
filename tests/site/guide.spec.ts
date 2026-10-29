@@ -168,3 +168,72 @@ test('the real userscript marks the guide as installed', async ({ page }) => {
   await expect(page.locator('.step:visible')).toContainText(version);
   expect(page.url().startsWith(GUIDE_URL)).toBe(true);
 });
+
+test.describe('finish review fixes', () => {
+  test.beforeEach(({}, info) => test.skip(info.project.name === 'iphone-landscape', 'portrait and desktop are enough'));
+
+  test('Done changes the step at once, without waiting for a hash event', async ({ browser }, info) => {
+    const page = await guidePage(browser, info, UA.iphone, { reducedMotion: 'reduce' });
+    await openGuide(page);
+    const id = await page.evaluate(() => {
+      (document.getElementById('next') as HTMLButtonElement).click();
+      return (document.querySelector('.step:not([hidden])') as HTMLElement).dataset.key;
+    });
+    expect(id).toBe('ios-2');
+    await page.context().close();
+  });
+
+  test('the last Chrome step does not send people into the Firefox steps', async ({ browser }, info) => {
+    const page = await guidePage(browser, info, UA.androidChrome);
+    await openGuide(page, { hash: 'android-2' });
+    await expect(page.getByRole('button', { name: 'Done, next step' })).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Back' })).toBeEnabled();
+    await page.context().close();
+  });
+
+  test('the Safari settings step names the path for iOS 18 and for older iOS', async ({ browser }, info) => {
+    const page = await guidePage(browser, info, UA.iphone);
+    await openGuide(page, { hash: 'ios-2' });
+    const step = page.locator('.step:visible');
+    await expect(step).toContainText('Apps › Safari › Extensions');
+    await expect(step).toContainText('Safari › Extensions');
+    await expect(step).toContainText(/iOS 17|older/);
+    await page.context().close();
+  });
+
+  test('chooser and installed labels have no eyebrow; installed carries a Checked date', async ({ browser }, info) => {
+    const chooser = await guidePage(browser, info, UA.unknown);
+    await openGuide(chooser);
+    await expect(chooser.locator('.step:visible .head')).toHaveCount(0);
+    await expect(chooser.getByRole('link', { name: 'Not your device?' })).toBeHidden();
+    await chooser.context().close();
+    const done = await guidePage(browser, info, UA.iphone);
+    await openGuide(done, { installed: '0.1.0' });
+    await expect(done.locator('.step:visible .head')).toHaveCount(0);
+    const checked = done.locator('.step:visible .row', { hasText: 'Checked' });
+    await expect(checked).toContainText(String(new Date().getFullYear()));
+    await done.context().close();
+  });
+
+  test('opening at a step keeps the header in view', async ({ browser }, info) => {
+    const page = await guidePage(browser, info, UA.iphone, { viewport: { width: 320, height: 640 } });
+    await openGuide(page, { hash: 'ios-3' });
+    await page.waitForLoadState('load');
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+    await expect(page.getByRole('link', { name: 'Not your device?' })).toBeInViewport();
+    await page.context().close();
+  });
+
+  test('desktop copy is honest and says click', async ({ browser }, info) => {
+    const page = await guidePage(browser, info, UA.desktopChrome);
+    await openGuide(page);
+    const first = page.locator('.step:visible');
+    await expect(first).toContainText(/does nothing on a computer/i);
+    const dirs = await first.locator('.dir li').allInnerTexts();
+    const caution = await first.locator('.caution').innerText();
+    for (const d of dirs) expect(caution).not.toContain(d.replace(/\.$/, ''));
+    await openGuide(page, { hash: 'desktop-2' });
+    await expect(page.locator('.step:visible .dir')).not.toContainText('Tap');
+    await page.context().close();
+  });
+});
