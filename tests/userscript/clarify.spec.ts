@@ -21,7 +21,7 @@ test('Details actions have text labels', async ({ page }) => {
   const row = firstProduct(page);
   await row.locator('.mbm-more').tap();
   const labels = await row.locator('> [data-mbm-role=actions] button').allInnerTexts();
-  expect(labels.map((l) => l.trim())).toContain('Add to planner');
+  expect(labels.map((l) => l.trim())).toContain('Add to Planner');
   expect(labels.every((l) => l.trim().length > 0)).toBe(true);
 });
 

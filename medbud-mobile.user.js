@@ -16,15 +16,15 @@
   'use strict';
 
   const VERSION = '0.1.0';
-  const VIEWPORT = 'width=device-width, initial-scale=1, viewport-fit=cover';
+  const VIEWPORT = 'width=device-width, initial-scale=1';
 
   // Two managers, a reinstall, or the app plus a manager must not apply everything twice.
   if (window.__medbudMobileLoaded) return;
   window.__medbudMobileLoaded = true;
 
-  /** Phone-sized device, judged by the short side so rotation does not change the answer. */
+  /** Phone-sized device, judged by screen size so rotation does not change the answer. Tablets keep the desktop site. */
   function isPhone() {
-    return Math.min(screen.width, screen.height) < 768;
+    return Math.min(screen.width, screen.height) < 768 && Math.max(screen.width, screen.height) < 1024;
   }
 
   /** At document-start the <html> element may not exist yet; run once it does. */
@@ -239,6 +239,7 @@
 }
 
 ${S} td[data-mbm-role=toggle] { display: none; }
+${S} td:is([data-mbm-role=notes], [data-mbm-role=count]) { display: none; }
 
 ${S} .mbm-top {
   all: unset; box-sizing: border-box; position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 2147482000;
@@ -270,7 +271,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   ${C}, ${C} > tbody { display: block; width: 100% !important; border: 0; }
   ${C} > thead { display: none; }
   ${R} {
-    display: grid; grid-template-columns: 52px minmax(0, 1fr) auto;
+    display: grid !important; grid-template-columns: 52px minmax(0, 1fr) auto;
     column-gap: 14px; row-gap: 2px; padding: 14px 14px 0; margin: 0 0 10px;
     border-radius: .5rem; height: auto !important; background: rgba(255, 255, 255, .035);
   }
@@ -280,7 +281,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   }
   ${R}:is(:hover, :active) > td { background: none !important; }
   ${R} > td:empty:not([data-mbm-role=toggle]) { display: none; }
-  ${R}:is(.mbm-merged, :empty) { display: none; }
+  ${R}:is(.mbm-merged, :empty, [style*="display: none"], [style*="display:none"]) { display: none !important; }
 
   /* Strains list and pharmacy menu share one layout; pharmacy rows simply have no meta line. */
   ${S} table.mbm-cards:is(.product, .pharmacy-list) > tbody > tr {
@@ -324,7 +325,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   ${S} table#producers.mbm-cards > tbody > tr.mbm-open {
     grid-template-areas: "thumb name name" "thumb count count" "items items items" "contact contact contact" "toggle toggle toggle";
   }
-  ${R} > td[data-mbm-role=count] { grid-area: count; font-size: .875rem; margin-top: 2px; }
+  ${R} > td[data-mbm-role=count] { display: block; grid-area: count; font-size: .875rem; margin-top: 2px; }
   ${R} > td[data-mbm-role=items] a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
   ${R} > td[data-mbm-role=items] img { max-height: 44px; width: auto !important; }
   ${R} > td:is([data-mbm-role=brands], [data-mbm-role=brands2]) img { max-height: 32px; width: auto !important; }
@@ -468,7 +469,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
       if (button.querySelector('.mbm-label')) return;
       const title = button.getAttribute('title') || '';
       let text = title;
-      if (button.classList.contains('calcStrain')) text = 'Add to planner';
+      if (button.classList.contains('calcStrain')) text = button.classList.contains('selected') ? 'Added to Planner' : 'Add to Planner';
       else if (/patient information leaflet/i.test(title)) text = 'Leaflet';
       else if (/certificate of analysis/i.test(title)) {
         const date = title.match(/\(([^)]+)\)\s*$/);
@@ -483,13 +484,15 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   }
 
   // Stock pills sometimes hold a pharmacy name (the only stockist) rather than a stock level.
-  const STOCK_WORDS = /^(available|in stock|expiring|low|medium|high|very high|out of stock|unavailable|discontinued|awaiting|limited|pre-?order|coming soon|changes)/i;
+  const STOCK_WORDS = /^(available|in stock|expiring|low|medium|high|very high|out of stock|unavailable|discontinued|awaiting|limited|pre-?order|coming soon|changes|cancel|confirming|tbc|ordered|product recall|no importer|eta|see |last stock|not yet)/i;
+  const MONTHS = /^(january|february|march|april|may|june|july|august|september|october|november|december)\b/i;
 
   function markExclusive(td) {
     const pill = td && td.querySelector('.availability');
-    if (!pill) return;
+    // Statuses, months and TBC use other classes (soon, discontinued, backorder); pharmacy names are low/limited.
+    if (!pill || !pill.matches('.stock-low, .limited')) return;
     const text = pill.textContent.trim();
-    if (text && !/\d/.test(text) && !STOCK_WORDS.test(text)) pill.classList.add('mbm-exclusive');
+    if (text && !/\d/.test(text) && !STOCK_WORDS.test(text) && !MONTHS.test(text)) pill.classList.add('mbm-exclusive');
   }
 
   /** Each column's header text (spaces removed, lower case), expanded across colspans. */
@@ -897,6 +900,10 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   }
 
   function onReady() {
+    // A second copy injected into a separate script world (two managers, or the app plus a manager) cannot see
+    // window.__medbudMobileLoaded; the DOM is shared, so mark it there before adding any controls or listeners.
+    if (document.documentElement.dataset.mbmReady) return;
+    document.documentElement.dataset.mbmReady = '1';
     // The style may have landed in <html> before <head> existed; move it so it sits after the site's CSS.
     const style = document.getElementById('medbud-mobile-css');
     if (style && document.head && style.parentNode !== document.head) document.head.appendChild(style);

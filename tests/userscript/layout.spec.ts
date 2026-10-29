@@ -33,7 +33,7 @@ test('viewport rewritten on phones', async ({ page }) => {
   await openMedbud(page, 'strains');
   await expect(page.locator('meta[name=viewport]')).toHaveAttribute(
     'content',
-    'width=device-width, initial-scale=1, viewport-fit=cover',
+    'width=device-width, initial-scale=1',
   );
   await expect(page.locator('html')).toHaveAttribute('data-medbud-mobile', '0.1.0');
   const transform = await page.evaluate(() => document.body.style.transform);
