@@ -71,6 +71,9 @@
   }
 
   const S = 'html[data-medbud-mobile]';
+  const C = `${S} table.mbm-cards`;
+  const R = `${C} > tbody > tr`;
+  const O = `${C} > tbody > tr.mbm-open`;
 
   const CSS = `
 @media (max-width: 1023px) {
@@ -108,54 +111,83 @@
 ${S} td[data-mbm-role=toggle] { display: none; }
 
 @media (max-width: 767px) {
-  /* Data tables as cards: name first, one meta line, the comparison number strongest, details on demand. */
-  ${S} table.mbm-cards, ${S} table.mbm-cards tbody { display: block; width: 100% !important; border: 0; }
-  ${S} table.mbm-cards thead { display: none; }
-  ${S} table.mbm-cards tbody tr {
+  /* Data tables as cards: name first, one meta line, the comparison number strongest, details on demand.
+     Child combinators only: clinic cells contain whole nested tables that must stay tables. */
+  ${C}, ${C} > tbody { display: block; width: 100% !important; border: 0; }
+  ${C} > thead { display: none; }
+  ${R} {
     display: grid; grid-template-columns: 52px minmax(0, 1fr) auto;
-    grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "toggle toggle toggle";
     column-gap: 14px; row-gap: 2px; padding: 14px 14px 0; margin: 0 0 10px;
     border-radius: .5rem; height: auto !important; background: rgba(255, 255, 255, .035);
   }
-  ${S} table.mbm-cards tbody tr.mbm-open {
-    grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "gen gen gen" "terps terps terps" "actions actions actions" "toggle toggle toggle";
-  }
-  ${S} table.mbm-cards td {
+  ${R} > td {
     display: block; padding: 0 !important; border: 0 !important; width: auto !important; height: auto !important;
     min-width: 0; text-align: left !important; background: none !important;
   }
-  ${S} table.mbm-cards tr:is(:hover, :active) td { background: none !important; }
-  ${S} table.mbm-cards td:empty:not([data-mbm-role=toggle]) { display: none; }
-  ${S} table.mbm-cards td[data-mbm-role=thumb] { grid-area: thumb; align-self: start; }
-  ${S} table.mbm-cards td[data-mbm-role=thumb] img { width: 52px !important; height: 52px !important; object-fit: contain; border-radius: .33rem; }
-  ${S} table.mbm-cards td:is([data-mbm-role=thumb2], [data-mbm-role=altprice], [data-mbm-role=packs]) { display: none; }
-  ${S} table.mbm-cards td[data-mbm-role=name] { grid-area: name; line-height: 1.3; }
-  ${S} table.mbm-cards td[data-mbm-role=name] > a:first-child { display: block; font-size: 1.0625rem; font-weight: 600; max-width: none !important; padding: 2px 0; }
-  ${S} table.mbm-cards td[data-mbm-role=name] small { opacity: .75; }
-  ${S} table.mbm-cards td[data-mbm-role=meta] { grid-area: meta; margin-top: 2px; }
-  ${S} table.mbm-cards td[data-mbm-role=meta] br { display: none; }
-  ${S} table.mbm-cards td[data-mbm-role=meta] > span { display: flex; flex-wrap: wrap; align-items: center; column-gap: 10px; row-gap: 2px; }
-  ${S} table.mbm-cards td[data-mbm-role=meta] .subspecies { font-weight: 600; }
-  ${S} table.mbm-cards td[data-mbm-role=ppg] { grid-area: price; margin-top: 14px; }
-  ${S} table.mbm-cards td[data-mbm-role=ppg] br { display: none; }
-  ${S} table.mbm-cards td[data-mbm-role=ppg] > span { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
-  ${S} table.mbm-cards td[data-mbm-role=ppg] > span > span { display: flex; align-items: baseline; gap: 8px; font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-  ${S} table.mbm-cards td[data-mbm-role=ppg] > span > span small { font-weight: 400; opacity: .7; }
-  ${S} table.mbm-cards td[data-mbm-role=stock] { grid-area: stock; margin-top: 14px; justify-self: end; align-self: center; text-align: right !important; }
-  ${S} table.mbm-cards td[data-mbm-role=stock] .quiet { display: block; margin-top: 4px; }
-  ${S} table.mbm-cards td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions]) { display: none; }
-  ${S} table.mbm-cards tr.mbm-open td[data-mbm-role=genetics] { display: block; grid-area: gen; margin-top: 14px; padding-top: 14px !important; border-top: 1px solid rgba(255, 255, 255, .08) !important; }
-  ${S} table.mbm-cards tr.mbm-open td[data-mbm-role=terps] { display: block; grid-area: terps; margin-top: 10px; }
-  ${S} table.mbm-cards tr.mbm-open td[data-mbm-role=actions] { display: flex; grid-area: actions; gap: 8px; margin-top: 10px; }
-  ${S} table.mbm-cards td[data-mbm-role=actions] br { display: none; }
-  ${S} table.mbm-cards td[data-mbm-role=toggle] { display: block; grid-area: toggle; margin: 8px -14px 0; }
-  ${S} table.mbm-cards button.mbm-more {
+  ${R}:is(:hover, :active) > td { background: none !important; }
+  ${R} > td:empty:not([data-mbm-role=toggle]) { display: none; }
+
+  /* Strains list and pharmacy menu share one layout; pharmacy rows simply have no meta line. */
+  ${S} table.mbm-cards:is(.product, .pharmacy-list) > tbody > tr {
+    grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "toggle toggle toggle";
+  }
+  ${S} table.mbm-cards:is(.product, .pharmacy-list) > tbody > tr.mbm-open {
+    grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "gen gen gen" "terps terps terps" "actions actions actions" "toggle toggle toggle";
+  }
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr { padding-bottom: 14px; }
+
+  /* Clinics: name with the first-year minimum beside it, access and consultations below. */
+  ${S} table#clinics.mbm-cards > tbody > tr {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "name price" "meta meta" "meta2 meta2" "toggle toggle";
+  }
+  ${S} table#clinics.mbm-cards > tbody > tr.mbm-open {
+    grid-template-areas: "name price" "meta meta" "meta2 meta2" "price2 price2" "pricing pricing" "pharmacy pharmacy" "contact contact" "ratings ratings" "toggle toggle";
+  }
+
+  ${R} > td[data-mbm-role=thumb] { grid-area: thumb; align-self: start; }
+  ${R} > td[data-mbm-role=thumb] img { width: 52px !important; height: 52px !important; object-fit: contain; border-radius: .33rem; }
+  ${R} > td:is([data-mbm-role=thumb2], [data-mbm-role=altprice], [data-mbm-role=packs]) { display: none; }
+  ${R} > td[data-mbm-role=name] { grid-area: name; line-height: 1.3; }
+  ${R} > td[data-mbm-role=name] > a:first-child { display: block; font-size: 1.0625rem; font-weight: 600; max-width: none !important; padding: 2px 0; }
+  ${R} > td[data-mbm-role=name] small { opacity: .75; }
+  ${R} > td[data-mbm-role=name] a { width: auto !important; max-width: 100% !important; white-space: normal !important; }
+  ${R} > td[data-mbm-role=meta] { grid-area: meta; margin-top: 2px; }
+  ${R} > td[data-mbm-role=meta2] { grid-area: meta2; margin-top: 2px; }
+  ${R} > td:is([data-mbm-role=meta], [data-mbm-role=meta2]) br { display: none; }
+  ${R} > td[data-mbm-role=meta] > span { display: flex; flex-wrap: wrap; align-items: center; column-gap: 10px; row-gap: 2px; }
+  ${R} > td[data-mbm-role=meta] .subspecies { font-weight: 600; }
+  ${R} > td[data-mbm-role=ppg] { grid-area: price; margin-top: 14px; }
+  ${R} > td[data-mbm-role=ppg] br { display: none; }
+  ${R} > td[data-mbm-role=ppg] > span { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
+  ${R} > td[data-mbm-role=ppg] > span > span { display: flex; align-items: baseline; gap: 8px; font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  ${R} > td[data-mbm-role=ppg] > span > span small { font-weight: 400; opacity: .7; }
+  ${R} > td[data-mbm-role=stock] { grid-area: stock; margin-top: 14px; justify-self: end; align-self: center; text-align: right !important; }
+  ${R} > td[data-mbm-role=stock] .quiet { display: block; margin-top: 4px; }
+  ${R} > td[data-mbm-role=price] { grid-area: price; justify-self: end; text-align: right !important; font-size: 1.25rem !important; font-weight: 700; font-variant-numeric: tabular-nums; }
+  ${R} > td:is([data-mbm-role=price], [data-mbm-role=price2])::before { display: block; font-size: .8125rem; font-weight: 400; opacity: .7; }
+  ${R} > td[data-mbm-role=price]::before { content: "First year from"; }
+  ${R} > td[data-mbm-role=price2]::before { content: "Each year after"; }
+
+  ${R} > td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions], [data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings]) { display: none; }
+  ${O} > td[data-mbm-role=genetics] { display: block; grid-area: gen; margin-top: 14px; padding-top: 14px !important; border-top: 1px solid rgba(255, 255, 255, .08) !important; }
+  ${O} > td[data-mbm-role=terps] { display: block; grid-area: terps; margin-top: 10px; }
+  ${O} > td[data-mbm-role=actions] { display: flex; grid-area: actions; gap: 8px; margin-top: 10px; }
+  ${O} > td:is([data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings]) { display: block; margin-top: 12px; }
+  ${O} > td[data-mbm-role=price2] { grid-area: price2; font-weight: 700; }
+  ${O} > td[data-mbm-role=pricing] { grid-area: pricing; }
+  ${O} > td[data-mbm-role=pharmacy] { grid-area: pharmacy; }
+  ${O} > td[data-mbm-role=contact] { grid-area: contact; overflow-wrap: anywhere; }
+  ${O} > td[data-mbm-role=ratings] { grid-area: ratings; }
+  ${R} > td[data-mbm-role=actions] br { display: none; }
+  ${R} > td[data-mbm-role=toggle] { display: block; grid-area: toggle; margin: 8px -14px 0; }
+  ${R} > td > button.mbm-more {
     all: unset; box-sizing: border-box; width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;
     font-size: .875rem; color: inherit; opacity: .85; border-top: 1px solid rgba(255, 255, 255, .08); cursor: pointer;
     -webkit-tap-highlight-color: rgba(255, 255, 255, .08);
   }
-  ${S} table.mbm-cards button.mbm-more:focus-visible { outline: 2px solid #b5e853; outline-offset: -2px; }
-  ${S} table.mbm-cards tr.mbm-open button.mbm-more i { transform: rotate(180deg); }
+  ${R} > td > button.mbm-more:focus-visible { outline: 2px solid #b5e853; outline-offset: -2px; }
+  ${O} > td > button.mbm-more i { transform: rotate(180deg); }
 }
 
 @media (max-width: 1023px) and (pointer: coarse) {
@@ -193,7 +225,7 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   // ---- Cards -------------------------------------------------------------
 
   /** Roles whose cells only show once a card's Details are open. A row with any of them gets a toggle. */
-  const DETAIL_ROLES = ['genetics', 'terps', 'actions'];
+  const DETAIL_ROLES = ['genetics', 'terps', 'actions', 'contact', 'pharmacy', 'pricing', 'price2', 'ratings'];
 
   /** Strains list rows (table.product): positional cells plus the site's own price/terps classes. */
   function STRAIN_ROLES(tr) {
@@ -214,7 +246,52 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     });
   }
 
-  const CARD_TABLES = [{ selector: 'table.product', roles: STRAIN_ROLES }];
+  /** Pharmacy menu rows (table.pharmacy-list, no header row): the strains layout without meta, genetics or terps. */
+  function PHARMACY_ROLES(tr) {
+    if (!tr.classList.contains('product-row')) return;
+    const cells = [...tr.children];
+    const tag = (td, role) => { if (td) td.dataset.mbmRole = role; };
+    tag(cells[0], 'thumb');
+    tag(cells[1], 'thumb2');
+    tag(cells[2], 'name');
+    cells.forEach((td) => { if (td.classList.contains('priceGram')) tag(td, 'ppg'); });
+    tag(cells[4], 'stock');
+    tag(cells[5], 'actions');
+  }
+
+  // Clinics table cells by header text (spaces removed, lower case). The last, unlabelled column holds the
+  // CQC ratings, not actions; the pricing cell contains a nested table of fees.
+  const CLINIC_HEADERS = {
+    prescribingclinic: 'name',
+    'contact/companydetails': 'contact',
+    defaultpharmacy: 'pharmacy',
+    pharmacyaccess: 'meta',
+    recurringconsultations: 'meta2',
+    clinicservicepricing: 'pricing',
+    'min.firstyear': 'price',
+    'min.yearlong-term': 'price2',
+    '': 'ratings',
+  };
+
+  function CLINIC_ROLES(tr) {
+    const table = tr.closest('table');
+    const roles = [];
+    table.querySelectorAll(':scope > thead th').forEach((th) => {
+      const key = th.textContent.replace(/\s+/g, '').toLowerCase();
+      for (let i = 0; i < (th.colSpan || 1); i++) roles.push(CLINIC_HEADERS[key]);
+    });
+    let column = 0;
+    [...tr.children].forEach((td) => {
+      if (roles[column]) td.dataset.mbmRole = roles[column];
+      column += td.colSpan || 1;
+    });
+  }
+
+  const CARD_TABLES = [
+    { selector: 'table.product', roles: STRAIN_ROLES },
+    { selector: 'table.pharmacy-list', roles: PHARMACY_ROLES },
+    { selector: 'table#clinics', roles: CLINIC_ROLES },
+  ];
   const cardQuery = matchMedia('(max-width: 767px)');
 
   function addToggle(tr) {
