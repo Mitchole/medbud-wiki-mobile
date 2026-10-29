@@ -11,6 +11,24 @@ for (const name of PAGE_NAMES) {
   });
 }
 
+test('nav "more" menu opens inside the screen', async ({ page }) => {
+  await openMedbud(page, 'home');
+  await page.locator('header nav .menuEllipsis__dropdown').tap();
+  const panel = page.locator('header nav .menuEllipsis__more');
+  await expect(panel).toBeVisible();
+  const box = (await panel.boundingBox())!;
+  const inner = await page.evaluate(() => window.innerWidth);
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(inner + 1);
+  // Every top-level entry is fully on screen, not cut off at the left edge.
+  const cut = await panel.evaluate((el) =>
+    [...el.querySelectorAll(':scope > ul > li > a, :scope li.level1 > a')]
+      .map((a) => a.getBoundingClientRect())
+      .filter((r) => r.width > 0 && (r.left < 0 || r.right > window.innerWidth + 1)).length,
+  );
+  expect(cut).toBe(0);
+});
+
 test('viewport rewritten on phones', async ({ page }) => {
   await openMedbud(page, 'strains');
   await expect(page.locator('meta[name=viewport]')).toHaveAttribute(

@@ -96,6 +96,17 @@
   ${S} :is(.bx-wrapper, .bx-viewport) { max-width: 100% !important; }
   ${S} aside.charter ul { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; }
   ${S} aside.charter li { float: none !important; width: auto !important; margin: 0 !important; }
+  /* The nav's "more" panel hangs off a 44px button with right:0, so it ran off the left edge.
+     Anchor it to the full-width nav bar and keep submenus inside it instead of flying out sideways. */
+  ${S} header nav { position: relative; }
+  ${S} header nav .menuEllipsis__dropdown { position: static !important; }
+  ${S} header nav .menuEllipsis__more {
+    left: 0 !important; right: 0 !important; width: auto !important; box-sizing: border-box;
+    max-height: 75vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  ${S} header nav .menuEllipsis__more ul { width: auto !important; }
+  ${S} header nav .menuEllipsis__more ul ul { position: static !important; }
+  ${S} header nav .menuEllipsis__more a { gap: 8px; }
   ${S} main :is(p, li, dd) { overflow-wrap: anywhere; }
   ${S} aside.company p { display: flex; flex-wrap: wrap; gap: 8px; }
   ${S} a.button { white-space: normal !important; width: auto !important; max-width: 100%; min-width: 0; box-sizing: border-box; overflow-wrap: anywhere; }
@@ -113,6 +124,7 @@ ${S} td[data-mbm-role=toggle] { display: none; }
 @media (max-width: 767px) {
   /* Data tables as cards: name first, one meta line, the comparison number strongest, details on demand.
      Child combinators only: clinic cells contain whole nested tables that must stay tables. */
+  ${S} .mbm-scroll:has(> table.mbm-cards) { overflow: visible; }
   ${C}, ${C} > tbody { display: block; width: 100% !important; border: 0; }
   ${C} > thead { display: none; }
   ${R} {
@@ -126,6 +138,7 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   }
   ${R}:is(:hover, :active) > td { background: none !important; }
   ${R} > td:empty:not([data-mbm-role=toggle]) { display: none; }
+  ${R}:is(.mbm-merged, :empty) { display: none; }
 
   /* Strains list and pharmacy menu share one layout; pharmacy rows simply have no meta line. */
   ${S} table.mbm-cards:is(.product, .pharmacy-list) > tbody > tr {
@@ -134,7 +147,16 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   ${S} table.mbm-cards:is(.product, .pharmacy-list) > tbody > tr.mbm-open {
     grid-template-areas: "thumb name name" "thumb meta meta" "price price stock" "gen gen gen" "terps terps terps" "actions actions actions" "toggle toggle toggle";
   }
-  ${S} table.mbm-cards.pharmacy-list > tbody > tr { padding-bottom: 14px; }
+  /* Cards without a Details toggle need their own bottom padding; with one, the toggle bar closes the card. */
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr:not(:has(> td[data-mbm-role=toggle])) { padding-bottom: 14px; }
+  /* Pharmacy price cell: pack price then rating, as sibling spans (unlike the strains list). */
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr > td[data-mbm-role=ppg] { display: flex !important; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 4px; }
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr > td[data-mbm-role=ppg] > span { display: inline !important; font-size: .875rem; font-weight: 400; }
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr > td[data-mbm-role=ppg] > span:first-child { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr > td[data-mbm-role=ppg] > span:first-child small { font-weight: 400; opacity: .7; margin-left: 6px; }
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr > td[data-mbm-role=ppg] > span > span { font-size: inherit; font-weight: inherit; }
+  /* The site's display face draws '<' as an arrow, so 'CBD <1%' read as 'CBD (arrow)1%'. */
+  ${S} table.mbm-cards.pharmacy-list > tbody > tr > td[data-mbm-role=name] a.title { font-family: "Open Sans", "Helvetica Neue", Helvetica, sans-serif !important; }
 
   /* Clinics: name with the first-year minimum beside it, access and consultations below. */
   ${S} table#clinics.mbm-cards > tbody > tr {
@@ -142,7 +164,7 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     grid-template-areas: "name price" "meta meta" "meta2 meta2" "toggle toggle";
   }
   ${S} table#clinics.mbm-cards > tbody > tr.mbm-open {
-    grid-template-areas: "name price" "meta meta" "meta2 meta2" "price2 price2" "pricing pricing" "pharmacy pharmacy" "contact contact" "ratings ratings" "toggle toggle";
+    grid-template-areas: "name price" "meta meta" "meta2 meta2" "price2 price2" "pricing pricing" "notes notes" "pharmacy pharmacy" "contact contact" "ratings ratings" "toggle toggle";
   }
 
   ${R} > td[data-mbm-role=thumb] { grid-area: thumb; align-self: start; }
@@ -151,6 +173,8 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   ${R} > td[data-mbm-role=name] { grid-area: name; line-height: 1.3; }
   ${R} > td[data-mbm-role=name] > a:first-child { display: block; font-size: 1.0625rem; font-weight: 600; max-width: none !important; padding: 2px 0; }
   ${R} > td[data-mbm-role=name] small { opacity: .75; }
+  ${R} > td[data-mbm-role=name] img:not(.country) { display: block; width: auto !important; height: auto !important; max-height: 32px; max-width: 160px; margin-top: 8px; }
+  ${R} > td:is([data-mbm-role=meta], [data-mbm-role=meta2]) * { text-align: left !important; }
   ${R} > td[data-mbm-role=name] a { width: auto !important; max-width: 100% !important; white-space: normal !important; }
   ${R} > td[data-mbm-role=meta] { grid-area: meta; margin-top: 2px; }
   ${R} > td[data-mbm-role=meta2] { grid-area: meta2; margin-top: 2px; }
@@ -169,11 +193,13 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   ${R} > td[data-mbm-role=price]::before { content: "First year from"; }
   ${R} > td[data-mbm-role=price2]::before { content: "Each year after"; }
 
-  ${R} > td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions], [data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings]) { display: none; }
+  ${R} > td:is([data-mbm-role=genetics], [data-mbm-role=terps], [data-mbm-role=actions], [data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings], [data-mbm-role=notes]) { display: none; }
   ${O} > td[data-mbm-role=genetics] { display: block; grid-area: gen; margin-top: 14px; padding-top: 14px !important; border-top: 1px solid rgba(255, 255, 255, .08) !important; }
   ${O} > td[data-mbm-role=terps] { display: block; grid-area: terps; margin-top: 10px; }
   ${O} > td[data-mbm-role=actions] { display: flex; grid-area: actions; gap: 8px; margin-top: 10px; }
-  ${O} > td:is([data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings]) { display: block; margin-top: 12px; }
+  ${O} > td:is([data-mbm-role=contact], [data-mbm-role=pharmacy], [data-mbm-role=pricing], [data-mbm-role=price2], [data-mbm-role=ratings], [data-mbm-role=notes]) { display: block; margin-top: 12px; }
+  ${O} > td[data-mbm-role=notes] { grid-area: notes; }
+  ${O} > td[data-mbm-role=notes] > div + div { margin-top: 6px; }
   ${O} > td[data-mbm-role=price2] { grid-area: price2; font-weight: 700; }
   ${O} > td[data-mbm-role=pricing] { grid-area: pricing; }
   ${O} > td[data-mbm-role=pharmacy] { grid-area: pharmacy; }
@@ -210,10 +236,9 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     (document.head || root).appendChild(style);
   }
 
-  /** Put every table that is not shown as cards in its own sideways-scrolling box. */
+  /** Put every table in its own sideways-scrolling box (card tables stop scrolling below 768px, in CSS). */
   function wrapWideTables(scope) {
     scope.querySelectorAll('table').forEach((table) => {
-      if (table.classList.contains('mbm-cards')) return;
       if (table.parentElement && table.parentElement.classList.contains('mbm-scroll')) return;
       const wrap = document.createElement('div');
       wrap.className = 'mbm-scroll';
@@ -225,7 +250,7 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   // ---- Cards -------------------------------------------------------------
 
   /** Roles whose cells only show once a card's Details are open. A row with any of them gets a toggle. */
-  const DETAIL_ROLES = ['genetics', 'terps', 'actions', 'contact', 'pharmacy', 'pricing', 'price2', 'ratings'];
+  const DETAIL_ROLES = ['genetics', 'terps', 'actions', 'contact', 'pharmacy', 'pricing', 'price2', 'ratings', 'notes'];
 
   /** Strains list rows (table.product): positional cells plus the site's own price/terps classes. */
   function STRAIN_ROLES(tr) {
@@ -274,6 +299,12 @@ ${S} td[data-mbm-role=toggle] { display: none; }
   };
 
   function CLINIC_ROLES(tr) {
+    // Each clinic is a main row, an empty spacer row and a notes row (star rating plus dated notes).
+    // The notes are copied into the clinic's own card; in card view the extra rows are hidden.
+    if (tr.classList.contains('notes')) {
+      tr.classList.add('mbm-merged');
+      return;
+    }
     const table = tr.closest('table');
     const roles = [];
     table.querySelectorAll(':scope > thead th').forEach((th) => {
@@ -285,6 +316,22 @@ ${S} td[data-mbm-role=toggle] { display: none; }
       if (roles[column]) td.dataset.mbmRole = roles[column];
       column += td.colSpan || 1;
     });
+    let next = tr.nextElementSibling;
+    // Spacer rows hold only whitespace, which WebKit does not count as :empty, so tag them here.
+    while (next && next.children.length === 0) {
+      next.classList.add('mbm-merged');
+      next = next.nextElementSibling;
+    }
+    if (next && next.classList.contains('notes')) {
+      const notes = document.createElement('td');
+      notes.dataset.mbmRole = 'notes';
+      [...next.children].forEach((cell) => {
+        const part = document.createElement('div');
+        part.innerHTML = cell.innerHTML;
+        notes.appendChild(part);
+      });
+      tr.appendChild(notes);
+    }
   }
 
   const CARD_TABLES = [
@@ -292,7 +339,6 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     { selector: 'table.pharmacy-list', roles: PHARMACY_ROLES },
     { selector: 'table#clinics', roles: CLINIC_ROLES },
   ];
-  const cardQuery = matchMedia('(max-width: 767px)');
 
   function addToggle(tr) {
     const td = document.createElement('td');
@@ -341,7 +387,11 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     });
   }
 
-  /** Cards in portrait-width screens, sideways-scrolling tables otherwise; re-run on rotation. */
+  /**
+   * Mark the card tables and tag their cells. Whether they actually look like cards is decided by the
+   * CSS media query alone: WebKit does not reliably report the viewport rewrite as a media change, so
+   * any width check made here could be stale and never corrected.
+   */
   function setupCards() {
     CARD_TABLES.forEach(({ selector, roles }) => {
       document.querySelectorAll(selector).forEach((table) => {
@@ -351,14 +401,7 @@ ${S} td[data-mbm-role=toggle] { display: none; }
           observeTable(table, roles);
           bindToggles(table);
         }
-        const wrap = table.parentElement;
-        if (cardQuery.matches) {
-          table.classList.add('mbm-cards');
-          if (wrap && wrap.classList.contains('mbm-scroll')) wrap.replaceWith(table);
-        } else {
-          table.classList.remove('mbm-cards');
-          wrapWideTables(table.parentNode);
-        }
+        table.classList.add('mbm-cards');
       });
     });
   }
@@ -369,7 +412,6 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     if (style && document.head && style.parentNode !== document.head) document.head.appendChild(style);
     setupCards();
     wrapWideTables(document);
-    cardQuery.addEventListener('change', setupCards);
   }
 
   fixViewport();

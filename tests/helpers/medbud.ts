@@ -55,10 +55,32 @@ export interface OpenOptions {
   transformHtml?: (html: string) => string;
   /** Start as a visitor who already accepted the site's notice, so its popup does not cover the page (default true). */
   consented?: boolean;
+  /** Serve the strains page with all 1,340 products instead of the first 60 per table (slow; default false). */
+  fullStrains?: boolean;
+}
+
+const STRAINS_ROWS = 60;
+const htmlCache = new Map<string, string>();
+
+/** Keep the first `keep` rows of every table.product body; the full page is 11MB and slows every test. */
+function trimProductTables(html: string, keep: number): string {
+  return html.replace(/(<table[^>]*class="[^"]*\bproduct\b[^"]*"[\s\S]*?<tbody[^>]*>)([\s\S]*?)(<\/tbody>)/g, (_m, open, body, close) => {
+    const rows = body.match(/<tr[\s>][\s\S]*?<\/tr>/g) ?? [];
+    return open + rows.slice(0, keep).join('\n') + close;
+  });
+}
+
+function fixtureHtml(name: PageName, full: boolean): string {
+  const key = `${name}:${full}`;
+  if (!htmlCache.has(key)) {
+    const html = readFileSync(pageFile(name), 'utf8');
+    htmlCache.set(key, name === 'strains' && !full ? trimProductTables(html, STRAINS_ROWS) : html);
+  }
+  return htmlCache.get(key)!;
 }
 
 /** Route every request for a medbud.wiki page to local fixtures; nothing reaches the network. */
-export async function routeMedbud(page: Page, opts: Pick<OpenOptions, 'transformHtml'> = {}): Promise<void> {
+export async function routeMedbud(page: Page, opts: Pick<OpenOptions, 'transformHtml' | 'fullStrains'> = {}): Promise<void> {
   const unserved: string[] = [];
   live.set(page, unserved);
   await page.context().route('**/*', async (route: Route) => {
@@ -66,7 +88,7 @@ export async function routeMedbud(page: Page, opts: Pick<OpenOptions, 'transform
     const type = route.request().resourceType();
     const name = pageByUrl.get(url.split('#')[0]);
     if (name) {
-      let html = readFileSync(pageFile(name), 'utf8');
+      let html = fixtureHtml(name, opts.fullStrains === true);
       if (opts.transformHtml) html = opts.transformHtml(html);
       return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: html });
     }

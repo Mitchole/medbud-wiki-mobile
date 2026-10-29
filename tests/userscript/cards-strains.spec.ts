@@ -47,7 +47,8 @@ test('details toggle opens and closes', async ({ page }) => {
 });
 
 test('toggle count matches rows, even when injected twice', async ({ page }) => {
-  await openMedbud(page, 'strains', { times: 2 });
+  // Full 1,340-product page: the one test that keeps real page size covered.
+  await openMedbud(page, 'strains', { times: 2, fullStrains: true });
   const table = page.locator('table.product').first();
   const rowCount = await table.locator('tbody tr').count();
   expect(rowCount).toBeGreaterThan(10);
@@ -93,12 +94,15 @@ test('no hover tint after tap', async ({ page }) => {
 test('rotation swaps cards for scroll', async ({ page }, info) => {
   test.skip(info.project.name !== 'pixel', 'pixel only');
   await openMedbud(page, 'strains');
-  await expect(page.locator('table.product.mbm-cards').first()).toBeVisible();
+  const firstRow = page.locator('table.product > tbody > tr').first();
+  const display = () => firstRow.evaluate((tr) => getComputedStyle(tr).display);
+  expect(await display()).toBe('grid');
   await page.setViewportSize({ width: 915, height: 412 });
-  await expect(page.locator('table.mbm-cards')).toHaveCount(0);
+  expect(await display()).toBe('table-row');
   await expect(page.locator('.mbm-scroll > table.product').first()).toBeAttached();
+  expect(await page.locator('.mbm-scroll').first().evaluate((d) => getComputedStyle(d).overflowX)).toBe('auto');
   expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
   await page.setViewportSize({ width: 412, height: 839 });
-  await expect(page.locator('table.product.mbm-cards').first()).toBeVisible();
+  expect(await display()).toBe('grid');
   expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
 });
