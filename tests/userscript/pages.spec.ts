@@ -122,3 +122,72 @@ for (const [name, noun] of [['producers', 'medications'], ['breeders', 'cultivar
     });
   });
 }
+
+test.describe('stats', () => {
+  test.skip(!fixturesAvailable('stats'), 'stats fixture missing');
+  test('stat columns are full width with counts beside their labels', async ({ page }) => {
+    await openMedbud(page, 'stats');
+    const inner = await innerWidth(page);
+    const block = page.locator('article.quad-three div.block').first();
+    expect((await block.boundingBox())!.width).toBeGreaterThanOrEqual(inner - 80);
+    const line = await page.locator('article.quad-three div.block li').filter({ has: page.locator('span') }).first().evaluate((li) => {
+      const span = li.querySelector('span')!.getBoundingClientRect();
+      const r = li.getBoundingClientRect();
+      return { single: r.height < 40, inside: span.top >= r.top - 1 && span.bottom <= r.bottom + 1 };
+    });
+    expect(line).toEqual({ single: true, inside: true });
+  });
+});
+
+test.describe('map', () => {
+  test.skip(!fixturesAvailable('map'), 'map fixture missing');
+  test('map fits the screen and lets vertical swipes scroll the page', async ({ page }) => {
+    await openMedbud(page, 'map');
+    const map = await page.locator('#map').evaluate((m) => ({ h: m.getBoundingClientRect().height, touch: getComputedStyle(m).touchAction }));
+    expect(map.h).toBeLessThanOrEqual(page.viewportSize()!.height * 0.65);
+    expect(map.touch).toContain('pan-y');
+  });
+});
+
+test.describe('guide', () => {
+  test('article comes first and the guide list folds behind a button', async ({ page }) => {
+    await openMedbud(page, 'guide');
+    const articleTop = (await page.locator('main article.quad-three').first().boundingBox())!.y;
+    const button = page.getByRole('button', { name: 'All guides' });
+    const buttonBox = (await button.boundingBox())!;
+    expect(buttonBox.y).toBeGreaterThan(articleTop);
+    expect(buttonBox.height).toBeGreaterThanOrEqual(44);
+    await expect(page.locator('aside.quad-one')).toBeHidden();
+    await button.tap();
+    await expect(page.locator('aside.quad-one')).toBeVisible();
+  });
+
+  test('share buttons sit on their own row with 44px targets', async ({ page }) => {
+    await openMedbud(page, 'guide');
+    const heights = await page.locator('nav.share-widget-custom a').evaluateAll((as) => as.map((a) => a.getBoundingClientRect().height).filter((h) => h > 0));
+    expect(heights.length).toBeGreaterThan(0);
+    expect(Math.min(...heights)).toBeGreaterThanOrEqual(44);
+  });
+});
+
+test.describe('home lists', () => {
+  test('latest edits and listings fit without sideways scrolling', async ({ page }) => {
+    await openMedbud(page, 'home');
+    const inner = await innerWidth(page);
+    const worst = await page.evaluate((inner) => {
+      const cells = [...document.querySelectorAll('table.latest > tbody > tr > td')];
+      return Math.max(...cells.map((td) => td.getBoundingClientRect().right)) - inner;
+    }, inner);
+    expect(worst).toBeLessThanOrEqual(0);
+    await expect(page.locator('table#edits > tbody > tr').first()).toContainText('Available');
+  });
+
+  test('feature cards are full width and video reviews sit two to a row', async ({ page }) => {
+    await openMedbud(page, 'home');
+    const inner = await innerWidth(page);
+    const widths = await page.locator('section.tri.home-feature').evaluateAll((s) => s.map((e) => e.getBoundingClientRect().width));
+    expect(Math.min(...widths)).toBeGreaterThanOrEqual(inner - 60);
+    const tops = await page.locator('section.video-review').evaluateAll((s) => s.slice(0, 2).map((e) => Math.round(e.getBoundingClientRect().top)));
+    expect(tops[0]).toBe(tops[1]);
+  });
+});

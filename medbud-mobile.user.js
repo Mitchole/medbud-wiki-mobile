@@ -141,6 +141,53 @@
   ${S} header nav .menuEllipsis__more ul ul { position: static !important; }
   ${S} header nav .menuEllipsis__more a { gap: 8px; }
 
+
+  /* Stats: seven 109px floated columns become full-width lists with each count on its label's line. */
+  ${S} article.quad-three div.block { float: none !important; width: auto !important; margin: 0 0 16px !important; }
+  ${S} article.quad-three div.block li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  ${S} article.quad-three div.block li > span { float: none !important; flex: 0 0 auto; }
+
+  /* Map: 800px tall and grabbing every swipe; now 60% of the screen and vertical swipes scroll the page. */
+  ${S} #map { height: 60vh !important; touch-action: pan-y pinch-zoom !important; }
+  ${S} .leaflet-control-zoom a { width: 44px !important; height: 44px !important; line-height: 44px !important; }
+
+  /* Guides: the article first, the 27-link guide list after it behind an "All guides" button. */
+  ${S} main.wrapper:has(> aside.quad-one) { display: flex; flex-direction: column; }
+  ${S} main.wrapper > aside.quad-one { order: 3; width: auto !important; }
+  ${S} main.wrapper > .mbm-fold-toggle { order: 2; }
+  ${S} main.wrapper:not(.mbm-guides-open) > aside.quad-one { display: none !important; }
+  ${S} nav.share-widget-custom { float: none !important; display: flex !important; flex-wrap: wrap; gap: 6px; width: auto !important; margin: 8px 0 !important; }
+  ${S} nav.share-widget-custom a { display: inline-flex !important; align-items: center; min-height: 44px; box-sizing: border-box; }
+
+  /* Home: the "latest" tables become two-line lists; feature cards full width; video reviews two to a row. */
+  ${S} .mbm-scroll:has(> table.latest) { overflow: visible; }
+  ${S} table.latest, ${S} table.latest > tbody { display: block; width: 100% !important; }
+  ${S} table.latest > tbody > tr {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; column-gap: 10px; row-gap: 2px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, .08);
+  }
+  ${S} table.latest > tbody > tr > td {
+    display: block; padding: 0 !important; border: 0 !important; width: auto !important; min-width: 0;
+    white-space: normal !important; text-align: left !important; overflow-wrap: anywhere;
+  }
+  ${S} table.latest img { width: 40px !important; height: auto !important; max-height: 40px; object-fit: contain; }
+  ${S} table#edits > tbody > tr > td:nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
+  ${S} table#edits > tbody > tr > td:nth-child(2) { grid-column: 2; grid-row: 1; font-weight: 600; }
+  ${S} table#edits > tbody > tr > td:nth-child(3) { grid-column: 2 / -1; grid-row: 2; }
+  ${S} table#edits > tbody > tr > td:nth-child(4) { grid-column: 3; grid-row: 1; text-align: right !important; }
+  ${S} table#new > tbody > tr > td:nth-child(2) { grid-column: 1; grid-row: 1 / span 4; }
+  ${S} table#new > tbody > tr > td:nth-child(1) { grid-column: 2; grid-row: 1; }
+  ${S} table#new > tbody > tr > td:nth-child(6) { grid-column: 3; grid-row: 1; text-align: right !important; }
+  ${S} table#new > tbody > tr > td:nth-child(3) { grid-column: 2 / -1; grid-row: 2; font-weight: 600; }
+  ${S} table#new > tbody > tr > td:nth-child(4) { grid-column: 2 / -1; grid-row: 3; }
+  ${S} table#new > tbody > tr > td:nth-child(5) { grid-column: 2 / -1; grid-row: 4; }
+  ${S} section.tri.home-feature { display: block !important; width: auto !important; margin: 0 0 12px !important; }
+  ${S} #video-reviews { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  ${S} #video-reviews > :not(section.video-review) { grid-column: 1 / -1; }
+  ${S} section.video-review { float: none !important; max-width: none !important; width: auto !important; margin: 0 !important; }
+  ${S} section.video-review img { width: 100% !important; height: auto !important; }
+  ${S} section.video-review lite-youtube { width: 100% !important; max-width: 100% !important; }
+
   /* Donate: the site sizes the text column as calc(100% - 426px) beside a 425px form, which is 0px on a phone. */
   ${S} main > iframe { float: none !important; width: 100% !important; margin: 0 0 16px !important; }
   ${S} main > section[style*="426px"] { float: none !important; width: auto !important; }
@@ -183,6 +230,13 @@
 }
 
 ${S} td[data-mbm-role=toggle] { display: none; }
+
+${S} .mbm-fold-toggle {
+  all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; min-height: 44px; margin: 8px 0; border: 1px solid rgba(255, 255, 255, .2); border-radius: .33rem;
+  font-size: .9375rem; font-weight: 600; cursor: pointer;
+}
+${S} .mbm-fold-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset: 2px; }
 
 ${S} .mbm-menu-close {
   all: unset; box-sizing: border-box; display: none; position: fixed; top: 8px; right: 8px; z-index: 2147483001;
@@ -700,6 +754,24 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     }
   }
 
+  /** Guides: the long guide list moves after the article and folds behind an "All guides" button. */
+  function addGuidesToggle(aside) {
+    const main = aside.parentElement;
+    if (!main || main.querySelector(':scope > .mbm-fold-toggle')) return;
+    if (!aside.id) aside.id = 'mbm-guides';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mbm-fold-toggle';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', aside.id);
+    button.textContent = 'All guides';
+    button.addEventListener('click', () => {
+      const open = main.classList.toggle('mbm-guides-open');
+      button.setAttribute('aria-expanded', String(open));
+    });
+    main.insertBefore(button, aside);
+  }
+
   function onReady() {
     // The style may have landed in <html> before <head> existed; move it so it sits after the site's CSS.
     const style = document.getElementById('medbud-mobile-css');
@@ -709,6 +781,8 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     whenPresent('#mb-grid > .mb-controls', addFiltersToggle);
     whenPresent('.menuEllipsis__drop-toggle', setupMenu);
     moveCharter();
+    const guides = document.querySelector('main.wrapper > aside.quad-one');
+    if (guides) addGuidesToggle(guides);
   }
 
   fixViewport();
