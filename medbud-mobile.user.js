@@ -188,6 +188,14 @@
   ${S} section.video-review img { width: 100% !important; height: auto !important; }
   ${S} section.video-review lite-youtube { width: 100% !important; max-width: 100% !important; }
 
+
+  /* Polish: faded text back to readable contrast, dead "Show Filters" hidden, footer links tappable. */
+  ${S} :is(.quiet, small) { opacity: 1 !important; }
+  ${S} body.device-mode-dark :is(.quiet, small.quiet) { color: #a8a8a8 !important; }
+  ${S} a.toggleFilter { display: none !important; }
+  ${S} footer a { display: inline-flex !important; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; box-sizing: border-box; }
+  ${S} figure.banner figcaption { position: static !important; }
+
   /* Donate: the site sizes the text column as calc(100% - 426px) beside a 425px form, which is 0px on a phone. */
   ${S} main > iframe { float: none !important; width: 100% !important; margin: 0 0 16px !important; }
   ${S} main > section[style*="426px"] { float: none !important; width: auto !important; }
@@ -230,6 +238,15 @@
 }
 
 ${S} td[data-mbm-role=toggle] { display: none; }
+
+${S} .mbm-top {
+  all: unset; box-sizing: border-box; position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 2147482000;
+  width: 48px; height: 48px; display: none; align-items: center; justify-content: center; border-radius: 50%;
+  background: #333; color: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, .35); cursor: pointer;
+}
+${S} .mbm-top.mbm-show { display: flex; }
+${S}.mbm-menu-open .mbm-top { display: none; }
+${S} .mbm-top:focus-visible { outline: 2px solid #b5e853; outline-offset: 2px; }
 
 ${S} .mbm-fold-toggle {
   all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -376,7 +393,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
   ${R} > td[data-mbm-role=toggle] { display: block; grid-area: toggle; margin: 8px -14px 0; }
   ${R} > td > button.mbm-more {
     all: unset; box-sizing: border-box; width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;
-    font-size: .875rem; color: inherit; opacity: .85; border-top: 1px solid rgba(255, 255, 255, .08); cursor: pointer;
+    font-size: .875rem; color: inherit; opacity: 1; border-top: 1px solid rgba(255, 255, 255, .08); cursor: pointer;
     -webkit-tap-highlight-color: rgba(255, 255, 255, .08);
   }
   ${R} > td > button.mbm-more:focus-visible { outline: 2px solid #b5e853; outline-offset: -2px; }
@@ -772,6 +789,31 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     main.insertBefore(button, aside);
   }
 
+  /** Long lists (strains is ~1,400 cards) get a back-to-top button once the reader is two screens down. */
+  function addBackToTop() {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mbm-top';
+    button.setAttribute('aria-label', 'Back to top');
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-arrow-up';
+    icon.setAttribute('aria-hidden', 'true');
+    button.appendChild(icon);
+    document.body.appendChild(button);
+    const update = () => button.classList.toggle('mbm-show', window.scrollY > window.innerHeight * 2);
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+    button.addEventListener('click', () => {
+      const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+    });
+  }
+
+  /** Flags inside headings are decoration; screen readers read every one before the heading's words. */
+  function silenceHeadingFlags() {
+    document.querySelectorAll(':is(h1, h2, h3, h4, h5, h6) img[alt^="Flag of"]').forEach((img) => { img.alt = ''; });
+  }
+
   function onReady() {
     // The style may have landed in <html> before <head> existed; move it so it sits after the site's CSS.
     const style = document.getElementById('medbud-mobile-css');
@@ -781,6 +823,8 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     whenPresent('#mb-grid > .mb-controls', addFiltersToggle);
     whenPresent('.menuEllipsis__drop-toggle', setupMenu);
     moveCharter();
+    addBackToTop();
+    silenceHeadingFlags();
     const guides = document.querySelector('main.wrapper > aside.quad-one');
     if (guides) addGuidesToggle(guides);
   }

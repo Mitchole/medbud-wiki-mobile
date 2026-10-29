@@ -76,6 +76,8 @@ export interface OpenOptions {
   transformHtml?: (html: string) => string;
   /** Start as a visitor who already accepted the site's notice, so its popup does not cover the page (default true). */
   consented?: boolean;
+  /** Use the site's dark theme (its device-mode cookie), as most visitors see it. */
+  dark?: boolean;
   /** Serve the strains page with all 1,340 products instead of the first 60 per table (slow; default false). */
   fullStrains?: boolean;
 }
@@ -145,6 +147,9 @@ export async function openMedbud(page: Page, name: PageName, opts: OpenOptions =
       { name: 'consent-access', value: '1', domain: 'medbud.wiki', path: '/' },
       { name: 'consent-analytics', value: '0', domain: 'medbud.wiki', path: '/' },
     ]);
+  }
+  if (opts.dark) {
+    await page.context().addCookies([{ name: 'device-mode', value: '1', domain: 'medbud.wiki', path: '/' }]);
   }
   if (opts.userscript !== false) await addUserscript(page, opts.times ?? 1);
   await page.goto(PAGES[name], { waitUntil: 'load' });
