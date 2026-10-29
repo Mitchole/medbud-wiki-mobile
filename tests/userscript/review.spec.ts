@@ -39,7 +39,8 @@ test.describe('phone-only behaviour', () => {
     await addUserscript(page);
     await page.addInitScript({ content: twin });
     await page.goto(PAGES.home);
-    await expect(page.locator('.mbm-menu-close')).toHaveCount(1);
+    await expect(page.locator('.mbm-burger')).toHaveCount(1);
+    await expect(page.locator('.mbm-bar')).toHaveCount(1);
     await expect(page.locator('.mbm-top')).toHaveCount(1);
     const toggle = page.getByRole('button', { name: 'Menu', exact: true });
     await toggle.tap();

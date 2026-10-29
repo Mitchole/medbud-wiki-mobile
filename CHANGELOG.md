@@ -2,6 +2,15 @@
 
 All notable changes to MedBud Mobile (unofficial). The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- The logo and a standard three-line menu button sit in a bar that stays at the top while scrolling; the button turns into a close (X) while the menu is open.
+- The top links (Login, Register, Public Charter, Advertising, Volunteers, Contact) move to the foot of the menu, wrapped to fit, instead of a sideways-scrolling row.
+
+### Fixed
+- The Planner panel ran off the left of the screen; it now opens full width under the Planner row.
+
 ## [0.1.0] - 2026-10-29
 
 First release.

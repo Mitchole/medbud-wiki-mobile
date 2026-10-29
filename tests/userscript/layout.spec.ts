@@ -13,7 +13,7 @@ for (const name of capturedPages()) {
 
 test('nav "more" menu opens inside the screen', async ({ page }) => {
   await openMedbud(page, 'home');
-  await page.locator('header nav .menuEllipsis__dropdown').tap();
+  await page.getByRole('button', { name: 'Menu', exact: true }).tap();
   const panel = page.locator('header nav .menuEllipsis__more');
   await expect(panel).toBeVisible();
   const box = (await panel.boundingBox())!;

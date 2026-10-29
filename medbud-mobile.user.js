@@ -97,22 +97,56 @@
   ${S} aside.charter ul { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; }
   ${S} aside.charter li { float: none !important; width: auto !important; margin: 0 !important; }
 
-  /* Header: logo and the dark-mode switch on one row, then search, planner and the nav bar (was ~555px). */
+  /* Header: the logo moves to a sticky top bar with the menu button (see .mbm-bar); then search, planner,
+     the planner's panel, and the nav bar with the dark-mode switch beside it (was ~555px). */
   ${S} header {
     display: grid !important; grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "logo switch" "search search" "planner planner" "nav nav"; align-items: center; column-gap: 8px;
+    grid-template-areas: "search search" "planner planner" "results results" "nav switch"; align-items: center; column-gap: 8px;
   }
-  ${S} header > a#logo { grid-area: logo; }
-  ${S} header > a#logo img { max-height: 40px; width: auto !important; margin-top: 0 !important; }
   ${S} header > form#search { grid-area: search; margin: 2px 0 !important; }
   ${S} header > #calculator { grid-area: planner; }
   ${S} header > #switchHolder { grid-area: switch; float: none !important; }
   ${S} header > nav { grid-area: nav; margin-top: 4px !important; }
-  ${S} header > :is(#js-search, #calculatorResults) { grid-column: 1 / -1; }
-  ${S} div.wrapper.top-links {
-    display: flex; flex-wrap: nowrap; gap: 0 12px; overflow-x: auto; -webkit-overflow-scrolling: touch;
-    white-space: nowrap; text-align: left; scrollbar-width: none;
+  ${S} header > #js-search { grid-column: 1 / -1; }
+  /* The planner panel was a 900px box hung 72px from the right; on a phone it opens in the flow under the Planner row. */
+  ${S} header > #calculatorResults {
+    grid-area: results; position: relative !important; top: auto !important; right: auto !important; left: auto !important;
+    width: auto !important; max-width: 100%; margin-top: 14px; box-sizing: border-box;
   }
+  ${S} #calculatorResults :is(div, select, table, p, blockquote) { max-width: 100% !important; box-sizing: border-box; }
+  ${S} #calculatorResults select { width: 100% !important; margin: 4px 0; }
+  ${S} #calculatorResults:before { right: 24px; }
+  ${S} #calculatorResults:after { right: 23.5px; }
+  /* Top links (login, register, charter, contact...) live at the foot of the menu sheet, wrapping as needed. */
+  ${S} div.wrapper.top-links { white-space: normal; text-align: left; overflow: visible; width: auto !important; }
+  ${S} div.wrapper.top-links > span:first-child { float: none !important; display: block; margin-bottom: 2px; }
+  ${S} .menuEllipsis__more > div.top-links {
+    margin: 16px 8px 0 !important; padding: 12px 8px 0; border-top: 1px solid rgba(255, 255, 255, .2); color: #ccc;
+  }
+  ${S} .menuEllipsis__more > div.top-links a { color: #fff !important; }
+
+  /* Sticky top bar: logo left, a standard three-line menu button right, as phones expect. */
+  ${S} .mbm-bar {
+    position: sticky; top: 0; z-index: 2147481000; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    min-height: 56px; padding: 4px 8px 4px 12px; box-sizing: border-box; background: #f2f2f2;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .08);
+  }
+  ${S} body.device-mode-dark .mbm-bar { background: #000; box-shadow: 0 1px 0 rgba(255, 255, 255, .12); }
+  ${S} .mbm-bar > a#logo { display: block; min-width: 0; }
+  ${S} .mbm-bar > a#logo img { display: block; max-height: 40px; width: auto !important; margin-top: 0 !important; }
+  ${S} .mbm-burger {
+    all: unset; box-sizing: border-box; flex: 0 0 auto; width: 48px; height: 48px; border-radius: .33rem;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer;
+    background: #333; color: #fff;
+  }
+  ${S} .mbm-burger > span { display: block; width: 22px; height: 2.5px; border-radius: 2px; background: currentColor; }
+  ${S} .mbm-burger:focus-visible { outline: 2px solid #b5e853; outline-offset: 2px; }
+  /* While the menu is open the bar stays above the sheet and its button becomes the close (X) button. */
+  ${S}.mbm-menu-open .mbm-burger > span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+  ${S}.mbm-menu-open .mbm-burger > span:nth-child(2) { opacity: 0; }
+  ${S}.mbm-menu-open .mbm-burger > span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+  /* The site's own "more" toggle in the nav is replaced by the bar's button. */
+  ${S} header nav .menuEllipsis__drop-toggle { display: none !important; }
 
   /* Tab strips (regions, statuses): one sideways-scrolling row instead of wrapped, overlapping labels. */
   ${S} div.tabs { display: flex !important; flex-wrap: nowrap; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -126,9 +160,9 @@
     width: auto !important; max-height: none !important; z-index: 2147483000; overflow-y: auto; overscroll-behavior: contain;
     background: #333; padding: 64px 8px 24px !important; box-sizing: border-box;
   }
-  ${S}.mbm-menu-open body { overflow: hidden; }
-  ${S}.mbm-menu-open .mbm-menu-close { display: flex; }
-
+  /* Lock scrolling on <html>: the site's overflow-x on <html> would make a locked <body> its own scroller and unstick the bar. */
+  ${S}.mbm-menu-open { overflow: hidden !important; }
+  
   /* The nav's "more" panel hangs off a 44px button with right:0, so it ran off the left edge.
      Anchor it to the full-width nav bar and keep submenus inside it instead of flying out sideways. */
   ${S} header nav { position: relative; }
@@ -256,13 +290,6 @@ ${S} .mbm-fold-toggle {
   font-size: .9375rem; font-weight: 600; cursor: pointer;
 }
 ${S} .mbm-fold-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset: 2px; }
-
-${S} .mbm-menu-close {
-  all: unset; box-sizing: border-box; display: none; position: fixed; top: 8px; right: 8px; z-index: 2147483001;
-  width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 50%;
-  background: rgba(255, 255, 255, .12); color: #fff; font-size: 1.25rem; cursor: pointer;
-}
-${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset: 2px; }
 
 @media (max-width: 767px) {
   /* Data tables as cards: name first, one meta line, the comparison number strongest, details on demand.
@@ -801,40 +828,36 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     grid.insertBefore(button, controls);
   }
 
-  /** The site's "more" menu opens on hover only. Make its toggle a real button opening a full-screen sheet. */
+  /** The site's "more" menu opens on hover only. The bar's menu button opens it as a full-screen sheet and closes it. */
   function setupMenu() {
     const root = document.documentElement;
-    const close = document.createElement('button');
-    close.type = 'button';
-    close.className = 'mbm-menu-close';
-    close.setAttribute('aria-label', 'Close menu');
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-times';
-    icon.setAttribute('aria-hidden', 'true');
-    close.appendChild(icon);
-    document.body.appendChild(close);
+    // The utility links join the foot of the sheet; the site's menu plugin only moves its own items in its list.
+    const topLinks = document.querySelector('div.wrapper.top-links');
+    const sheet = document.querySelector('header nav .menuEllipsis__more');
+    if (topLinks && sheet) sheet.appendChild(topLinks);
 
-    const toggles = () => document.querySelectorAll('.menuEllipsis__drop-toggle');
+    const toggles = () => document.querySelectorAll('.mbm-burger, .menuEllipsis__drop-toggle');
     const label = (toggle) => {
-      toggle.setAttribute('role', 'button');
-      toggle.setAttribute('tabindex', '0');
+      if (!toggle.classList.contains('mbm-burger')) {
+        toggle.setAttribute('role', 'button');
+        toggle.setAttribute('tabindex', '0');
+      }
       toggle.setAttribute('aria-label', 'Menu');
       toggle.setAttribute('aria-expanded', String(root.classList.contains('mbm-menu-open')));
     };
     const set = (open) => {
       root.classList.toggle('mbm-menu-open', open);
       toggles().forEach(label);
-      if (open) close.focus();
-      else if (toggles()[0]) toggles()[0].focus();
+      if (toggles()[0]) toggles()[0].focus();
     };
     toggles().forEach(label);
     // The site's menu plugin can rebuild its toggle on resize, so listen on the document.
     document.addEventListener('click', (event) => {
-      if (event.target.closest('.menuEllipsis__drop-toggle')) {
+      if (event.target.closest('.mbm-burger, .menuEllipsis__drop-toggle')) {
         event.preventDefault();
         set(!root.classList.contains('mbm-menu-open'));
-      } else if (event.target.closest('.mbm-menu-close')) {
-        set(false);
+      } else if (event.target.closest('.menuEllipsis__more .login_open')) {
+        set(false); // the site's login popup opens over the page, not under the sheet
       }
     }, true);
     document.addEventListener('keydown', (event) => {
@@ -844,6 +867,23 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
         set(!root.classList.contains('mbm-menu-open'));
       }
     });
+  }
+
+  /** A sticky bar at the top of the page holding the logo and a three-line menu button. */
+  function addTopBar() {
+    const logo = document.querySelector('header > a#logo');
+    const header = logo && logo.parentNode;
+    if (!logo || document.querySelector('.mbm-bar')) return;
+    const bar = document.createElement('div');
+    bar.className = 'mbm-bar';
+    const burger = document.createElement('button');
+    burger.type = 'button';
+    burger.className = 'mbm-burger';
+    burger.setAttribute('aria-label', 'Menu');
+    burger.setAttribute('aria-expanded', 'false');
+    for (let i = 0; i < 3; i++) burger.appendChild(document.createElement('span'));
+    bar.append(logo, burger);
+    header.parentNode.insertBefore(bar, header);
   }
 
   /** The six "trust" badges filled ~400px of every first screen; they move to just above the footer. */
@@ -910,6 +950,7 @@ ${S} .mbm-menu-close:focus-visible { outline: 2px solid #b5e853; outline-offset:
     setupCards();
     wrapWideTables(document);
     whenPresent('#mb-grid > .mb-controls', addFiltersToggle);
+    addTopBar();
     whenPresent('.menuEllipsis__drop-toggle', setupMenu);
     moveCharter();
     addBackToTop();
