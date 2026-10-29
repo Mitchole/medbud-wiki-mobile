@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { extractMeta, checkVersion } from './build-meta.mjs';
 
 const source = readFileSync(new URL('../medbud-mobile.user.js', import.meta.url), 'utf8');
+const version = /const VERSION = '([^']+)'/.exec(source)[1];
 
 test('extractMeta returns only the metadata block', () => {
   const meta = extractMeta(source);
@@ -17,10 +18,10 @@ test('extractMeta throws when there is no metadata block', () => {
 });
 
 test('checkVersion returns the version when @version and VERSION agree', () => {
-  assert.equal(checkVersion(source), '0.1.0');
+  assert.equal(checkVersion(source), version);
 });
 
 test('checkVersion throws when @version and VERSION disagree', () => {
-  const bumpedHeaderOnly = source.replace('// @version      0.1.0', '// @version      0.2.0');
-  assert.throws(() => checkVersion(bumpedHeaderOnly), /0\.2\.0.*0\.1\.0|0\.1\.0.*0\.2\.0/);
+  const bumpedHeaderOnly = source.replace(/(\/\/ @version\s+)\S+/, '$199.0.0');
+  assert.throws(() => checkVersion(bumpedHeaderOnly), /99\.0\.0/);
 });

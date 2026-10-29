@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { capturedPages, fixturesAvailable, horizontalOverflow, openMedbud, routeMedbud, addUserscript } from '../helpers/medbud';
+import { capturedPages, fixturesAvailable, horizontalOverflow, openMedbud, routeMedbud, addUserscript, USERSCRIPT_VERSION } from '../helpers/medbud';
 
 test.skip(!fixturesAvailable(), 'fixtures missing: see tests/fixtures/README.md');
 test.skip(({ isMobile }) => !isMobile, 'phone projects only');
@@ -35,7 +35,7 @@ test('viewport rewritten on phones', async ({ page }) => {
     'content',
     'width=device-width, initial-scale=1',
   );
-  await expect(page.locator('html')).toHaveAttribute('data-medbud-mobile', '0.1.0');
+  await expect(page.locator('html')).toHaveAttribute('data-medbud-mobile', USERSCRIPT_VERSION);
   const transform = await page.evaluate(() => document.body.style.transform);
   expect(['', 'none', 'scale(1)']).toContain(transform);
 });
@@ -77,6 +77,6 @@ test('no script errors on a page without the expected markup', async ({ page }) 
   );
   await addUserscript(page);
   await page.goto('https://medbud.wiki/unknown/');
-  await expect(page.locator('html')).toHaveAttribute('data-medbud-mobile', '0.1.0');
+  await expect(page.locator('html')).toHaveAttribute('data-medbud-mobile', USERSCRIPT_VERSION);
   expect(errors).toEqual([]);
 });

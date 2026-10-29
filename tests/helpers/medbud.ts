@@ -6,6 +6,8 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const FIXTURES = path.join(ROOT, 'tests', 'fixtures');
 export const USERSCRIPT_PATH = path.join(ROOT, 'medbud-mobile.user.js');
+/** The userscript's VERSION constant, so tests follow version bumps. */
+export const USERSCRIPT_VERSION = /const VERSION = '([^']+)'/.exec(readFileSync(USERSCRIPT_PATH, 'utf8'))![1];
 
 export const PAGES = {
   home: 'https://medbud.wiki/',

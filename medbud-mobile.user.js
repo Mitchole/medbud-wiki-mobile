@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MedBud Mobile (unofficial)
 // @namespace    https://github.com/Mitchole/medbud-wiki-mobile
-// @version      0.1.0
+// @version      0.1.1
 // @description  Makes medbud.wiki usable on phones. Unofficial; not affiliated with MedBud.
 // @match        https://medbud.wiki/*
 // @match        https://mitchole.github.io/medbud-wiki-mobile/*
@@ -15,7 +15,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '0.1.0';
+  const VERSION = '0.1.1';
   const VIEWPORT = 'width=device-width, initial-scale=1';
 
   // Two managers, a reinstall, or the app plus a manager must not apply everything twice.

@@ -2,7 +2,7 @@
 
 All notable changes to MedBud Mobile (unofficial). The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.1] - 2026-10-29
 
 ### Added
 - A step-by-step install guide (`site/index.html`) that detects your phone and browser, with a check that it worked, published to GitHub Pages with the userscript once the repository is public.
@@ -13,6 +13,12 @@ All notable changes to MedBud Mobile (unofficial). The format follows [Keep a Ch
 
 ### Fixed
 - The Planner panel ran off the left of the screen; it now opens full width under the Planner row.
+- "Only at" was added to status and month pills (for example "Only at Cancelled"); it now goes only on single-stockist pharmacy names.
+- Rows revealed by "Include Unavailable?" turned back into table rows instead of cards.
+- In landscape, cells added for cards showed up as extra table columns.
+- With two copies of the script running (two managers), controls were doubled and the menu would not open.
+- Planner buttons always said "Add"; they now say "Added to Planner" for items already in it.
+- Small tablets such as the iPad mini were treated as phones; they keep the desktop site.
 
 ## [0.1.0] - 2026-10-29
 
@@ -29,4 +35,5 @@ First release.
 - 44px tap targets, 14px minimum body text, readable contrast for faded text, a back-to-top button on long pages.
 - Fixes for the donate page, stats lists, the map size, guides (article first) and the home page's latest lists and video grid.
 
+[0.1.1]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Mitchole/medbud-wiki-mobile/releases/tag/v0.1.0

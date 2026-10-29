@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { fixturesAvailable, openMedbud, addUserscript } from '../helpers/medbud';
+import { fixturesAvailable, openMedbud, addUserscript, USERSCRIPT_VERSION } from '../helpers/medbud';
 
 test('desktop untouched', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop project only');
@@ -16,7 +16,7 @@ test('install page only gets the flag', async ({ page }) => {
   );
   await addUserscript(page);
   await page.goto('https://mitchole.github.io/medbud-wiki-mobile/');
-  await expect(page.locator('html')).toHaveAttribute('data-medbud-mobile', '0.1.0');
+  await expect(page.locator('html')).toHaveAttribute('data-medbud-mobile', USERSCRIPT_VERSION);
   await expect(page.locator('#medbud-mobile-css')).toHaveCount(0);
 });
 
