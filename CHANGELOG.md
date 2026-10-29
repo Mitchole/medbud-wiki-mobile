@@ -2,6 +2,11 @@
 
 All notable changes to MedBud Mobile (unofficial). The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- The iPhone install step now matches Safari on iOS 26: open Manage Extensions from the button left of the address bar and tap the word Userscripts to get its install prompt (confirmed on a real iPhone).
+
 ## [0.1.1] - 2026-10-29
 
 ### Added
