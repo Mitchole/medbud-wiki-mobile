@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { PAGE_NAMES, fixturesAvailable, horizontalOverflow, openMedbud, routeMedbud, addUserscript } from '../helpers/medbud';
+import { capturedPages, fixturesAvailable, horizontalOverflow, openMedbud, routeMedbud, addUserscript } from '../helpers/medbud';
 
 test.skip(!fixturesAvailable(), 'fixtures missing: see tests/fixtures/README.md');
 test.skip(({ isMobile }) => !isMobile, 'phone projects only');
 
-for (const name of PAGE_NAMES) {
+for (const name of capturedPages()) {
   test(`no horizontal overflow on ${name}`, async ({ page }) => {
     await openMedbud(page, name);
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
@@ -55,11 +55,11 @@ test('strain detail sidebar stacks', async ({ page }) => {
 });
 
 test('no script errors from the userscript on any page', async ({ page }) => {
-  // Loads all seven fixtures in turn (strains alone is 11MB), which outlasts the default on WebKit.
-  test.setTimeout(180_000);
+  // Loads every captured fixture in turn (formulary is 9MB), which outlasts the default on WebKit.
+  test.setTimeout(400_000);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(`${e.message}\n${e.stack ?? ''}`));
-  for (const name of PAGE_NAMES) {
+  for (const name of capturedPages()) {
     await openMedbud(page, name);
   }
   expect(errors.filter((e) => /medbud-mobile|mbm/i.test(e))).toEqual([]);

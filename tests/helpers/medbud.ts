@@ -15,6 +15,17 @@ export const PAGES = {
   'clinic-detail': 'https://medbud.wiki/clinics/dispensed/',
   pharmacy: 'https://medbud.wiki/pharmacies/ips-pharma/',
   guide: 'https://medbud.wiki/guides/patients-joining/eligibility-conditions/',
+  pharmacies: 'https://medbud.wiki/pharmacies/',
+  producers: 'https://medbud.wiki/producers/',
+  breeders: 'https://medbud.wiki/breeders/',
+  formulary: 'https://medbud.wiki/formulary/',
+  donate: 'https://medbud.wiki/donate/',
+  stats: 'https://medbud.wiki/stats/',
+  map: 'https://medbud.wiki/map/',
+  'vape-cartridges': 'https://medbud.wiki/vape-cartridges/',
+  oils: 'https://medbud.wiki/oils/',
+  extracts: 'https://medbud.wiki/extracts/',
+  discounts: 'https://medbud.wiki/discounts/',
 } as const;
 
 export type PageName = keyof typeof PAGES;
@@ -33,8 +44,18 @@ const PIXEL = Buffer.from(
   'base64',
 );
 
-export function fixturesAvailable(): boolean {
-  return PAGE_NAMES.every((n) => existsSync(pageFile(n))) && Object.values(ASSETS).every((p) => existsSync(p));
+/** The pages captured first; suites written before the critique depend on exactly these. */
+export const CORE_PAGES: PageName[] = ['home', 'strains', 'strain-detail', 'clinics', 'clinic-detail', 'pharmacy', 'guide'];
+
+/** True when the site assets and every named page fixture exist (default: the core pages). */
+export function fixturesAvailable(...names: PageName[]): boolean {
+  const pages = names.length ? names : CORE_PAGES;
+  return pages.every((n) => existsSync(pageFile(n))) && Object.values(ASSETS).every((p) => existsSync(p));
+}
+
+/** Pages whose fixture file exists. */
+export function capturedPages(): PageName[] {
+  return PAGE_NAMES.filter((n) => existsSync(pageFile(n)));
 }
 
 const live = new WeakMap<Page, string[]>();

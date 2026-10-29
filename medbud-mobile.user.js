@@ -107,6 +107,36 @@
   ${S} header nav .menuEllipsis__more ul { width: auto !important; }
   ${S} header nav .menuEllipsis__more ul ul { position: static !important; }
   ${S} header nav .menuEllipsis__more a { gap: 8px; }
+
+  /* Donate: the site sizes the text column as calc(100% - 426px) beside a 425px form, which is 0px on a phone. */
+  ${S} main > iframe { float: none !important; width: 100% !important; margin: 0 0 16px !important; }
+  ${S} main > section[style*="426px"] { float: none !important; width: auto !important; }
+
+  /* Formulary: drop the desktop filter sidebar behind a Filters button and make each product a full-width row. */
+  ${S} .mbm-filters-toggle {
+    all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; min-height: 44px; margin: 8px 0; border: 1px solid rgba(255, 255, 255, .2); border-radius: .33rem;
+    font-size: .9375rem; font-weight: 600; cursor: pointer;
+  }
+  ${S} .mbm-filters-toggle:focus-visible { outline: 2px solid #b5e853; outline-offset: 2px; }
+  ${S} #mb-grid .mb-controls { float: none !important; width: auto !important; max-width: none !important; }
+  ${S} #mb-grid:not(.mbm-filters-open) .mb-controls { display: none !important; }
+  ${S} #mb-grid .mb-rows { float: none !important; width: auto !important; margin: 0 !important; }
+  ${S} #mb-grid .mb-row:not(.mb-head):not(.mb-hidden) {
+    float: none !important; width: auto !important; height: auto !important; display: grid !important;
+    grid-template-columns: 72px minmax(0, 1fr); grid-template-areas: "img title" "img avail" "img price" "cap cap";
+    column-gap: 14px; row-gap: 6px; padding: 14px !important; margin: 0 0 10px !important; box-sizing: border-box;
+  }
+  ${S} #mb-grid .mb-row .mb-card-image-holder { display: contents; }
+  ${S} #mb-grid .mb-row .mb-card-image-link { grid-area: img; width: 72px !important; height: auto !important; }
+  ${S} #mb-grid .mb-row .mb-card-image-link img { width: 72px !important; height: 72px !important; object-fit: contain; }
+  ${S} #mb-grid .mb-row figcaption {
+    grid-area: cap; position: static !important; width: auto !important; height: auto !important;
+    font-size: 12px !important; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  }
+  ${S} #mb-grid .mb-row .mb-card-title { grid-area: title; width: auto !important; }
+  ${S} #mb-grid .mb-row .availability { grid-area: avail; float: none !important; justify-self: start; width: auto !important; }
+  ${S} #mb-grid .mb-row .mb-card-price { grid-area: price; width: auto !important; height: auto !important; }
   ${S} main :is(p, li, dd) { overflow-wrap: anywhere; }
   ${S} aside.company p { display: flex; flex-wrap: wrap; gap: 8px; }
   ${S} a.button { white-space: normal !important; width: auto !important; max-width: 100%; min-width: 0; box-sizing: border-box; overflow-wrap: anywhere; }
@@ -406,12 +436,47 @@ ${S} td[data-mbm-role=toggle] { display: none; }
     });
   }
 
+  /** Run once the first element matching the selector exists; the site builds some widgets after load. */
+  function whenPresent(selector, callback) {
+    const found = document.querySelector(selector);
+    if (found) return callback(found);
+    const observer = new MutationObserver(() => {
+      const el = document.querySelector(selector);
+      if (!el) return;
+      observer.disconnect();
+      callback(el);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    // Pages without the widget stop watching once everything has loaded.
+    window.addEventListener('load', () => setTimeout(() => observer.disconnect(), 5000), { once: true });
+  }
+
+  /** Formulary: the 17 filter cards (about 7,000px on a phone) fold behind one button. */
+  function addFiltersToggle() {
+    const grid = document.getElementById('mb-grid');
+    const controls = grid && grid.querySelector(':scope > .mb-controls');
+    if (!controls || grid.querySelector(':scope > .mbm-filters-toggle')) return;
+    if (!controls.id) controls.id = 'mbm-filters';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mbm-filters-toggle';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', controls.id);
+    button.textContent = 'Filters';
+    button.addEventListener('click', () => {
+      const open = grid.classList.toggle('mbm-filters-open');
+      button.setAttribute('aria-expanded', String(open));
+    });
+    grid.insertBefore(button, controls);
+  }
+
   function onReady() {
     // The style may have landed in <html> before <head> existed; move it so it sits after the site's CSS.
     const style = document.getElementById('medbud-mobile-css');
     if (style && document.head && style.parentNode !== document.head) document.head.appendChild(style);
     setupCards();
     wrapWideTables(document);
+    whenPresent('#mb-grid > .mb-controls', addFiltersToggle);
   }
 
   fixViewport();
